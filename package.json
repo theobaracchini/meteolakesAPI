@@ -1,0 +1,16 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "meteolakes back end service",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Daniel Forte Marques",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.3",
+    "netcdfjs": "file:../netcdfjs ",
+    "papaparse": "^4.6.1"
+  }
+}
