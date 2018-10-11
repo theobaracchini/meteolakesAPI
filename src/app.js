@@ -1,6 +1,6 @@
 'use strict';
 
-const csv = require('csv-express');
+const csv = require('csv-express'); // eslint-disable-line no-unused-vars
 const express = require('express');
 const helmet = require('helmet');
 const controller = require('./controller');
@@ -21,5 +21,5 @@ app.get('/api/:variable/:time/', (req, res) => {
 });
 
 app.listen(8000, () => {
-    console.log('Example app listening on port 8000!')
+    console.log('Example app listening on port 8000!');
 });

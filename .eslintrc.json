@@ -1,0 +1,11 @@
+{
+  "extends": ["standard"],
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "rules": {
+    "indent": ["error", 4, { "SwitchCase": 1 }],
+    "semi": ["error", "always"]
+  }
+}
