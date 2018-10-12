@@ -4,6 +4,7 @@ const fs = require('fs');
 const NetCDFReader = require('../../netcdfjs');
 const dimensions = require('./enum/dimensions');
 const variables = require('./enum/variables');
+const utils = require('./utils');
 
 class MeteolakesFile {
     constructor (path) {
@@ -23,7 +24,7 @@ class MeteolakesFile {
         var size = colSize * rowSize;
         var startIndex = this.getTimeIndex(time) * size * depthSize + this.getDepthIndex(depth) * size;
         var result = this.reader.getDataVariableSlice(variable, startIndex, size);
-        return this.to2indicesArray(result, colSize, rowSize);
+        return utils.to2DArray(result, colSize, rowSize);
     }
 
     get2DVariable (variable, time) {
@@ -32,10 +33,11 @@ class MeteolakesFile {
         var size = colSize * rowSize;
         var startIndex = this.getTimeIndex(time) * size;
         var result = this.reader.getDataVariableSlice(variable, startIndex, size);
-        return this.to2indicesArray(result, colSize, rowSize);
+        return utils.to2DArray(result, colSize, rowSize);
     }
 
     getTimeIndex (time) {
+
         /* TODO How to transform the time value into DateTime
         var date = new Date(2018, 6, 25, 10)
         console.log(date.getTime());
@@ -67,17 +69,6 @@ class MeteolakesFile {
         } else {
             return currentMaxIndex;
         }
-    }
-
-    to2indicesArray (array, colSize, rowSize) {
-        var result = [];
-        for (var rowPosition = 0; rowPosition < rowSize; rowPosition++) {
-            for (var colPosition = 0; colPosition < colSize; colPosition++) {
-                if (rowPosition === 0) { result.push([]); }
-                result[colPosition][rowPosition] = array[colPosition + rowPosition * colSize];
-            }
-        }
-        return result;
     }
 }
 
