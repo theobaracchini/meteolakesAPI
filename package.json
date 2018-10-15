@@ -4,9 +4,10 @@
   "description": "meteolakes back end service",
   "main": "src/app.js",
   "scripts": {
-    "eslint": "eslint src",
+    "eslint": "eslint src test",
     "start": "node src/app.js",
-    "test": "jest"
+    "test": "npm run test-jest && npm run eslint",
+    "test-jest": "jest"
   },
   "author": "Daniel Forte Marques",
   "license": "ISC",

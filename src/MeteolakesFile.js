@@ -18,57 +18,31 @@ class MeteolakesFile {
     }
 
     get3DVariable (variable, time, depth) {
-        var colSize = this.dimensions.find(dim => dim.name === dimensions.Y).size;
-        var rowSize = this.dimensions.find(dim => dim.name === dimensions.X).size;
-        var depthSize = this.dimensions.find(dim => dim.name === dimensions.Z).size;
-        var size = colSize * rowSize;
-        var startIndex = this.getTimeIndex(time) * size * depthSize + this.getDepthIndex(depth) * size;
-        var result = this.reader.getDataVariableSlice(variable, startIndex, size);
+        let colSize = this.dimensions.find(dim => dim.name === dimensions.Y).size;
+        let rowSize = this.dimensions.find(dim => dim.name === dimensions.X).size;
+        let depthSize = this.dimensions.find(dim => dim.name === dimensions.Z).size;
+        let size = colSize * rowSize;
+
+        let timeIndex = utils.getIndexFromValue(this.timeArray, utils.transformDate(time));
+        let depthIndex = utils.getIndexFromValue(this.depthArray, Math.abs(depth) * -1);
+        let startIndex = timeIndex * size * depthSize + depthIndex * size;
+
+        let result = this.reader.getDataVariableSlice(variable, startIndex, size);
+
         return utils.to2DArray(result, colSize, rowSize);
     }
 
     get2DVariable (variable, time) {
-        var colSize = this.dimensions.find(dim => dim.name === dimensions.Y).size;
-        var rowSize = this.dimensions.find(dim => dim.name === dimensions.X).size;
-        var size = colSize * rowSize;
-        var startIndex = this.getTimeIndex(time) * size;
-        var result = this.reader.getDataVariableSlice(variable, startIndex, size);
+        let colSize = this.dimensions.find(dim => dim.name === dimensions.Y).size;
+        let rowSize = this.dimensions.find(dim => dim.name === dimensions.X).size;
+        let size = colSize * rowSize;
+
+        let timeIndex = utils.getIndexFromValue(this.timeArray, utils.transformDate(time));
+        let startIndex = timeIndex * size;
+
+        let result = this.reader.getDataVariableSlice(variable, startIndex, size);
+
         return utils.to2DArray(result, colSize, rowSize);
-    }
-
-    getTimeIndex (time) {
-
-        /* TODO How to transform the time value into DateTime
-        var date = new Date(2018, 6, 25, 10)
-        console.log(date.getTime());
-        console.log(date.toDateString());
-        console.log(this.timeArray); */
-        return 0;
-    }
-
-    getDepthIndex (depth) {
-        depth = Math.abs(depth) * -1;
-
-        // divide and conquer
-        var currentMinIndex = 0;
-        var currentMaxIndex = this.depthArray.length - 1;
-        var middleIndex = Math.floor(this.depthArray.length / 2);
-
-        while (currentMaxIndex - currentMinIndex > 1) {
-            if (this.depthArray[middleIndex] < depth) {
-                currentMinIndex = middleIndex;
-            } else {
-                currentMaxIndex = middleIndex;
-            }
-
-            middleIndex = Math.floor((currentMaxIndex - currentMinIndex) / 2) + currentMinIndex;
-        }
-
-        if (Math.abs(depth - this.depthArray[currentMinIndex]) < Math.abs(depth - this.depthArray[currentMaxIndex])) {
-            return currentMinIndex;
-        } else {
-            return currentMaxIndex;
-        }
     }
 }
 
