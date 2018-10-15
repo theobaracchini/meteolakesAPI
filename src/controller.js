@@ -10,8 +10,8 @@ function getVariable (variable, time, depth) {
 
     switch (variable) {
         case variables.TEMPERATURE :
-        case variables.HORIZONTAL_VELOCITIY :
-        case variables.VERTICAL_VELOCITIY :
+        case variables.HORIZONTAL_VELOCITY :
+        case variables.VERTICAL_VELOCITY :
             return file.get3DVariable(variable, time, depth);
         case variables.WATER_LEVEL :
             return file.get2DVariable(variable, time);
