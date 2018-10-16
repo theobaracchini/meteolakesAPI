@@ -4,8 +4,8 @@ const MeteolakesFile = require('./MeteolakesFile');
 const variables = require('./enum/variables');
 const utils = require('./utils');
 
-function getVariable (variable, time, depth) {
-    const file = new MeteolakesFile('../geneva_2018_week30.nc');
+function getVariable (lake, variable, time, depth) {
+    const file = new MeteolakesFile(utils.getFilePath(lake, time));
     variable = variables[variable.toUpperCase()];
 
     switch (variable) {

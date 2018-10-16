@@ -1,5 +1,7 @@
 'use-strict';
 
+const dateUtils = require('./date');
+
 function meteolakesError (statement, reason) {
     if (statement) {
         throw new TypeError('Error occured during Meteolakes API call: ' + reason);
@@ -14,13 +16,6 @@ function to2DArray (array, colSize, rowSize) {
             result[colPosition][rowPosition] = array[colPosition + rowPosition * colSize];
         }
     }
-    return result;
-}
-
-function transformDate (jsTimestamp) {
-    const jsZero = 719529;
-    const milisecondsInDay = 86400000;
-    let result = jsTimestamp / milisecondsInDay + jsZero;
     return result;
 }
 
@@ -47,7 +42,24 @@ function getIndexFromValue (array, value) {
     }
 }
 
+function getFilePath (lake, time) {
+    let path = '';
+    const date = new Date(Number.parseFloat(time));
+    const dateDetails = dateUtils.getDateDetails(date);
+    let year = dateDetails.year;
+    let week = dateDetails.week;
+    let filename = `${lake}_${year}_week${week}.nc`;
+
+    if (lake === 'geneva') {
+        path = `../data/${year}/netcdf/${filename}`;
+    } else {
+        path = `../data_${lake}/${year}/netcdf/${filename}`;
+    }
+
+    return path;
+}
+
 module.exports.meteolakesError = meteolakesError;
 module.exports.to2DArray = to2DArray;
-module.exports.transformDate = transformDate;
 module.exports.getIndexFromValue = getIndexFromValue;
+module.exports.getFilePath = getFilePath;

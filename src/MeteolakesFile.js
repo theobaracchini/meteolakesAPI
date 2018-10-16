@@ -4,7 +4,9 @@ const fs = require('fs');
 const NetCDFReader = require('../../netcdfjs');
 const dimensions = require('./enum/dimensions');
 const variables = require('./enum/variables');
+const logger = require('./logger');
 const utils = require('./utils');
+const dateUtils = require('./date');
 
 class MeteolakesFile {
     constructor (path) {
@@ -23,11 +25,13 @@ class MeteolakesFile {
         let depthSize = this.dimensions.find(dim => dim.name === dimensions.Z).size;
         let size = colSize * rowSize;
 
-        let timeIndex = utils.getIndexFromValue(this.timeArray, utils.transformDate(time));
+        let timeIndex = utils.getIndexFromValue(this.timeArray, dateUtils.transformDate(time));
         let depthIndex = utils.getIndexFromValue(this.depthArray, Math.abs(depth) * -1);
         let startIndex = timeIndex * size * depthSize + depthIndex * size;
 
         let result = this.reader.getDataVariableSlice(variable, startIndex, size);
+
+        logger.info(`Retrieve ${variable} data from time index ${timeIndex} and depth index ${depthIndex} (initial index = 0) on a 2D array of size ${rowSize}x${colSize}`);
 
         return utils.to2DArray(result, colSize, rowSize);
     }
@@ -37,10 +41,12 @@ class MeteolakesFile {
         let rowSize = this.dimensions.find(dim => dim.name === dimensions.X).size;
         let size = colSize * rowSize;
 
-        let timeIndex = utils.getIndexFromValue(this.timeArray, utils.transformDate(time));
+        let timeIndex = utils.getIndexFromValue(this.timeArray, dateUtils.transformDate(time));
         let startIndex = timeIndex * size;
 
         let result = this.reader.getDataVariableSlice(variable, startIndex, size);
+
+        logger.info(`Retrieve ${variable} data from time index ${timeIndex} (initial index = 0) on a 2D array of size ${rowSize}x${colSize}`);
 
         return utils.to2DArray(result, colSize, rowSize);
     }
