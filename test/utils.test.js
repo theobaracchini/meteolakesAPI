@@ -1,7 +1,7 @@
 'use-strict';
 
-const utils = require('../src/utils');
-const dateUtils = require('../src/date');
+const utils = require('utils');
+const dateUtils = require('date');
 
 describe('utils module', () => {
     test('should convert a 1 dimentional array into a 2 dimentional array', () => {

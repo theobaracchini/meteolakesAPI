@@ -2,11 +2,11 @@
 
 const fs = require('fs');
 const NetCDFReader = require('../../netcdfjs');
-const dimensions = require('./enum/dimensions');
-const variables = require('./enum/variables');
-const logger = require('./logger');
-const utils = require('./utils');
-const dateUtils = require('./date');
+const dimensions = require('enum/dimensions');
+const variables = require('enum/variables');
+const logger = require('logger');
+const utils = require('utils');
+const dateUtils = require('date');
 
 class MeteolakesFile {
     constructor (path) {

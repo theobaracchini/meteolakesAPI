@@ -1,6 +1,6 @@
 'use-strict';
 
-const dateUtils = require('./date');
+const dateUtils = require('date');
 
 function meteolakesError (statement, reason) {
     if (statement) {

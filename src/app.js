@@ -3,8 +3,8 @@
 const csv = require('csv-express'); // eslint-disable-line no-unused-vars
 const express = require('express');
 const helmet = require('helmet');
-const controller = require('./controller');
-const logger = require('./logger');
+const controller = require('controller');
+const logger = require('logger');
 
 const app = express();
 app.use(helmet());

@@ -1,8 +1,8 @@
 'use-strict';
 
-const MeteolakesFile = require('./MeteolakesFile');
-const variables = require('./enum/variables');
-const utils = require('./utils');
+const MeteolakesFile = require('MeteolakesFile');
+const variables = require('enum/variables');
+const utils = require('utils');
 
 function getVariable (lake, variable, time, depth) {
     const file = new MeteolakesFile(utils.getFilePath(lake, time));
