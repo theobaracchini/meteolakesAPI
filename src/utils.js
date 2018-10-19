@@ -1,6 +1,7 @@
 'use-strict';
 
 const dateUtils = require('date');
+const path = require('path');
 
 function meteolakesError (statement, reason) {
     if (statement) {
@@ -43,7 +44,8 @@ function getIndexFromValue (array, value) {
 }
 
 function getFilePath (lake, time) {
-    let path = '';
+    let filePath = '';
+    let basePath = path.dirname(path.dirname(__dirname));
     const date = new Date(Number.parseFloat(time));
     const dateDetails = dateUtils.getDateDetails(date);
     let year = dateDetails.year;
@@ -51,12 +53,12 @@ function getFilePath (lake, time) {
     let filename = `${lake}_${year}_week${week}.nc`;
 
     if (lake === 'geneva') {
-        path = `../data/${year}/netcdf/${filename}`;
+        filePath = path.join(basePath, 'data', year.toString(), 'netcdf', filename);
     } else {
-        path = `../data_${lake}/${year}/netcdf/${filename}`;
+        filePath = path.join(basePath, `data_${lake}`, year.toString(), 'netcdf', filename);
     }
 
-    return path;
+    return filePath;
 }
 
 module.exports.meteolakesError = meteolakesError;

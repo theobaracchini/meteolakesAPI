@@ -34,3 +34,5 @@ app.use(function (err, req, res, next) {
 app.listen(8000, () => {
     logger.info('Meteolakes API listening on port 8000!');
 });
+
+module.exports = app;

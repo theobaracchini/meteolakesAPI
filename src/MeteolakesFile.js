@@ -12,6 +12,7 @@ class MeteolakesFile {
     constructor (path) {
         const data = fs.readFileSync(path);
 
+        this.path = path;
         this.reader = new NetCDFReader(data); // read the header
 
         this.header = this.reader.header;
@@ -36,11 +37,12 @@ class MeteolakesFile {
         if(depth !== null && depth !== undefined) {
             let depthIndex = utils.getIndexFromValue(this.depthArray, Math.abs(depth) * -1);
             startIndex = timeIndex * this.depthSize * size + depthIndex * size;
-            message = `Retrieve ${variable} data from time index ${timeIndex} and depth index ` +
+            message = `Retrieve ${variable} data from file ${this.path} at time index ${timeIndex} and depth index ` +
                 `${depthIndex} (initial index = 0) on a 2D array of size ${this.rowSize}x${this.colSize}`;
         } else {
             startIndex = timeIndex * size;
-            message = `Retrieve ${variable} data from time index ${timeIndex} (initial index = 0) on a 2D array of size ${this.rowSize}x${this.colSize}`;
+            message = `Retrieve ${variable} data from file ${this.path} at time index ${timeIndex} ` +
+                `(initial index = 0) on a 2D array of size ${this.rowSize}x${this.colSize}`;
         }
 
         let result = this.reader.getDataVariableSlice(variable, startIndex, size);

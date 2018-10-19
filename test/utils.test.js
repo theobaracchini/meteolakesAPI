@@ -1,9 +1,22 @@
 'use-strict';
 
+const path = require('path');
 const utils = require('utils');
 const dateUtils = require('date');
 
 describe('utils module', () => {
+    test('should throw an error if predicate is true', () => {
+        expect(function () {
+            utils.meteolakesError(true, 'test');
+        }).toThrow();
+    });
+
+    test('shouldn\'t throw an error if predicate is false', () => {
+        expect(function () {
+            utils.meteolakesError(false, 'test');
+        }).not.toThrow();
+    });
+
     test('should convert a 1 dimentional array into a 2 dimentional array', () => {
         let init = [0, 1, 2, 3, 4, 5, 6, 7, 8];
         let expected = [[0, 3, 6], [1, 4, 7], [2, 5, 8]];
@@ -19,10 +32,20 @@ describe('utils module', () => {
         expect(utils.getIndexFromValue(array, value)).toBe(expected);
     });
 
-    test('should find file path', () => {
+    test('should find file path if it\'s geneva lake', () => {
         let lake = 'geneva';
         let time = 1532314800000;
-        let expected = '../data/2018/netcdf/geneva_2018_week30.nc';
+        let baseDir = path.dirname(path.dirname(__dirname));
+        let expected = path.join(baseDir, 'data', '2018', 'netcdf', 'geneva_2018_week30.nc');
+
+        expect(utils.getFilePath(lake, time)).toBe(expected);
+    });
+
+    test('should find file path if it\'s any other lake', () => {
+        let lake = 'greifen';
+        let time = 1492293600000;
+        let baseDir = path.dirname(path.dirname(__dirname));
+        let expected = path.join(baseDir, 'data_greifen', '2017', 'netcdf', 'greifen_2017_week15.nc');
 
         expect(utils.getFilePath(lake, time)).toBe(expected);
     });
