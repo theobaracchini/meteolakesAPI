@@ -28,7 +28,11 @@ app.get('/api/:lake/:variable/:time/', (req, res) => {
 
 app.use(function (err, req, res, next) {
     logger.error(err.stack);
-    res.status(500).send(err.message);
+    let statusCode = 500;
+    if (err.message.includes('Error occured during Meteolakes API call:')) {
+        statusCode = 400;
+    }
+    res.status(statusCode).send(err.message);
 });
 
 app.listen(8000, () => {

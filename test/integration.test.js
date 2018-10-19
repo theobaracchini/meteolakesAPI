@@ -39,4 +39,39 @@ describe('MeteolakesAPI', () => {
                 expect(result[8][145]).toBe('0.7336804866790771');
             });
     });
+
+    test('should not work with an invalid variable name', () => {
+        return request(app)
+            .get('/api/geneva/wrong_variable/1532325600000')
+            .expect(400)
+            .expect('Error occured during Meteolakes API call: invalid variable argument');
+    });
+
+    test('should not work with an invalid lake name', () => {
+        return request(app)
+            .get('/api/lake/water_level/1532325600000')
+            .expect(400)
+            .expect('Error occured during Meteolakes API call: ENOENT: no such file or directory, open \'D:\\Dan\\workspace\\data_lake\\2018\\netcdf\\lake_2018_week30.nc\'');
+    });
+
+    test('should not work with an invalid timestamp', () => {
+        return request(app)
+            .get('/api/geneva/water_level/timestamp')
+            .expect(400)
+            .expect('Error occured during Meteolakes API call: invalid time argument');
+    });
+
+    test('should not work with a too big or too small timestamp', () => {
+        return request(app)
+            .get('/api/geneva/water_level/123456789')
+            .expect(400)
+            .expect('Error occured during Meteolakes API call: ENOENT: no such file or directory, open \'D:\\Dan\\workspace\\data\\1970\\netcdf\\geneva_1970_week1.nc\'');
+    });
+
+    test('should not work with an invalid depth', () => {
+        return request(app)
+            .get('/api/geneva/temperature/1532325600000/depth')
+            .expect(400)
+            .expect('Error occured during Meteolakes API call: invalid depth argument');
+    });
 });

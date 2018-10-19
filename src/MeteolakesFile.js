@@ -10,7 +10,12 @@ const dateUtils = require('date');
 
 class MeteolakesFile {
     constructor (path) {
-        const data = fs.readFileSync(path);
+        let data = null;
+        try {
+            data = fs.readFileSync(path);
+        } catch (err) {
+            utils.meteolakesError(true, err.message);
+        }
 
         this.path = path;
         this.reader = new NetCDFReader(data); // read the header
