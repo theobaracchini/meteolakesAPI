@@ -26,6 +26,18 @@ app.get('/api/:lake/:variable/:time/', (req, res) => {
     res.csv(controller.getVariable(req.params.lake, req.params.variable, req.params.time));
 });
 
+app.get('/api/:lake/:variable/:time/:depth/:x/:y', (req, res) => {
+    res.setHeader('Content-disposition', 'attachment; filename=data_test.csv');
+    res.set('Content-Type', 'text/csv');
+    res.send(controller.getValue(req.params.lake, req.params.variable, req.params.time, req.params.depth, req.params.x, req.params.y).toString());
+});
+
+app.get('/api/:lake/:variable/:time/:x/:y', (req, res) => {
+    res.setHeader('Content-disposition', 'attachment; filename=data_test.csv');
+    res.set('Content-Type', 'text/csv');
+    res.send(controller.getValue(req.params.lake, req.params.variable, req.params.time, null, req.params.x, req.params.y).toString());
+});
+
 app.use(function (err, req, res, next) {
     logger.error(err.stack);
     let statusCode = 500;

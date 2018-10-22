@@ -49,6 +49,18 @@ describe('utils module', () => {
 
         expect(utils.getFilePath(lake, time)).toBe(expected);
     });
+
+    test('should find coordinate indexes of a given (x, y) point', () => {
+        let longitudeCor = [[0, 0, 0, 0, 0, 119799.4, 119872.8, 119945.7, 120018.6, 120092.1, 120166.8, 120243.3, 120321.7, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 120141.8, 120220.3, 120298.2, 120376.1, 120454.5, 120534.2, 120615.8, 120699.2, 0, 0, 0, 0, 0]];
+        let latitudeCor = [[0, 0, 0, 0, 0, 502630.2, 502290.1, 501935.7, 501581.3, 501220.6, 500851.7, 500475.4, 500099.22, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 502686.4, 502336.3, 501986.2, 501632.5, 501272.5, 500904.6, 500529.6, 500154.7, 0, 0, 0, 0, 0]];
+        let y = 120080;
+        let x = 501220;
+        let expected = { M: 9, N: 0 };
+
+        expect(utils.getCoordinatesIndex(latitudeCor, longitudeCor, x, y)).toEqual(expected);
+    });
 });
 
 describe('date module', () => {

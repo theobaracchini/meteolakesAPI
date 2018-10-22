@@ -3,6 +3,8 @@
 const dateUtils = require('date');
 const path = require('path');
 
+const MAX_DISTANCE = 1000;
+
 function meteolakesError (statement, reason) {
     if (statement) {
         throw new TypeError('Error occured during Meteolakes API call: ' + reason);
@@ -43,6 +45,34 @@ function getIndexFromValue (array, value) {
     }
 }
 
+function getCoordinatesIndex (xArray, yArray, x, y) {
+    let maxN = xArray.length;
+    let maxM = xArray[0].length;
+    let minDistance = Number.MAX_VALUE;
+    let finalM = -1;
+    let finalN = -1;
+
+    meteolakesError(xArray.length === yArray.length &&
+        xArray[0][0] && yArray[0][0] &&
+        xArray[0].length === yArray[0].length, 'invalid coordinates array');
+
+    for (let m = 0; m < maxM; m++) {
+        for (let n = 0; n < maxN; n++) {
+            let distance = Math.pow(x - xArray[n][m], 2) + Math.pow(y - yArray[n][m], 2);
+
+            if (distance < minDistance) {
+                minDistance = distance;
+                finalM = m;
+                finalN = n;
+            }
+        }
+    }
+
+    meteolakesError(minDistance > MAX_DISTANCE, 'specified coordinates outside the lake');
+
+    return { M: finalM, N: finalN };
+}
+
 function getFilePath (lake, time) {
     let filePath = '';
     let basePath = path.dirname(path.dirname(__dirname));
@@ -65,3 +95,4 @@ module.exports.meteolakesError = meteolakesError;
 module.exports.to2DArray = to2DArray;
 module.exports.getIndexFromValue = getIndexFromValue;
 module.exports.getFilePath = getFilePath;
+module.exports.getCoordinatesIndex = getCoordinatesIndex;

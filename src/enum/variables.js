@@ -5,6 +5,6 @@ module.exports = {
     VERTICAL_VELOCITY: 'V1',
     TIME: 'time',
     DEPTH: 'ZK',
-    LONGITUDE: 'Xcor',
-    LATITUDE: 'Ycor'
+    LONGITUDE: 'YCOR',
+    LATITUDE: 'XCOR'
 };

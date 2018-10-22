@@ -40,6 +40,34 @@ describe('MeteolakesAPI', () => {
             });
     });
 
+    test('should GET /api/:lake/:variable/:time/:depth/:x/:y', () => {
+        return request(app)
+            .get('/api/geneva/temperature/1532336400000/100/516040/140140')
+            .then(response => {
+                expect(response.statusCode).toBe(200);
+                expect(response.header['content-length']).toBe('17');
+                expect(response.header['content-type']).toBe('text/csv; charset=utf-8');
+
+                let result = csvParser.parse(response.text).data;
+                expect(result.length).toBe(1);
+                expect(result).toEqual([['5.638596057891846']]);
+            });
+    });
+
+    test('should GET /api/:lake/:variable/:time/:x/:y', () => {
+        return request(app)
+            .get('/api/geneva/water_level/1532347200000/541000/145600')
+            .then(response => {
+                expect(response.statusCode).toBe(200);
+                expect(response.header['content-length']).toBe('18');
+                expect(response.header['content-type']).toBe('text/csv; charset=utf-8');
+
+                let result = csvParser.parse(response.text).data;
+                expect(result.length).toBe(1);
+                expect(result).toEqual([['0.7352995872497559']]);
+            });
+    });
+
     test('should not work with an invalid variable name', () => {
         return request(app)
             .get('/api/geneva/wrong_variable/1532325600000')
@@ -73,5 +101,33 @@ describe('MeteolakesAPI', () => {
             .get('/api/geneva/temperature/1532325600000/depth')
             .expect(400)
             .expect('Error occured during Meteolakes API call: invalid depth argument');
+    });
+
+    test('should not work if depth is required', () => {
+        return request(app)
+            .get('/api/geneva/temperature/1532325600000')
+            .expect(400)
+            .expect('Error occured during Meteolakes API call: variable R1 requires depth value');
+    });
+
+    test('should not work with invalid x coordinate', () => {
+        return request(app)
+            .get('/api/geneva/water_level/1532325600000/x/123456')
+            .expect(400)
+            .expect('Error occured during Meteolakes API call: invalid x argument');
+    });
+
+    test('should not work with invalid y coordinate', () => {
+        return request(app)
+            .get('/api/geneva/temperature/1532325600000/200/563241/y')
+            .expect(400)
+            .expect('Error occured during Meteolakes API call: invalid y argument');
+    });
+
+    test('should not work if coordinates are too far away from the lake', () => {
+        return request(app)
+            .get('/api/geneva/temperature/1532325600000/150/500000/100000')
+            .expect(400)
+            .expect('Error occured during Meteolakes API call: specified coordinates outside the lake');
     });
 });
