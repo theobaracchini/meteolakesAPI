@@ -2,6 +2,7 @@
 
 const dateUtils = require('date');
 const path = require('path');
+const dataBasePath = require('config/config')().data_path;
 
 const MAX_DISTANCE = 1000;
 
@@ -75,7 +76,6 @@ function getCoordinatesIndex (xArray, yArray, x, y) {
 
 function getFilePath (lake, time) {
     let filePath = '';
-    let basePath = path.dirname(path.dirname(__dirname));
     const date = new Date(Number.parseFloat(time));
     const dateDetails = dateUtils.getDateDetails(date);
     let year = dateDetails.year;
@@ -83,9 +83,9 @@ function getFilePath (lake, time) {
     let filename = `${lake}_${year}_week${week}.nc`;
 
     if (lake === 'geneva') {
-        filePath = path.join(basePath, 'data', year.toString(), 'netcdf', filename);
+        filePath = path.join(dataBasePath, 'data', year.toString(), 'netcdf', filename);
     } else {
-        filePath = path.join(basePath, `data_${lake}`, year.toString(), 'netcdf', filename);
+        filePath = path.join(dataBasePath, `data_${lake}`, year.toString(), 'netcdf', filename);
     }
 
     return filePath;
