@@ -4,7 +4,7 @@
   "description": "meteolakes back end service",
   "main": "src/app.js",
   "scripts": {
-    "build": "babel src —-out-dir dist",
+    "build": "babel src -d dist",
     "coverage": "jest --coverage",
     "eslint": "eslint src test",
     "serve": "node dist/app.js",
