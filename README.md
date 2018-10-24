@@ -9,7 +9,7 @@ Run `$ npm install` and then you can start the application locally using `$ npm 
 ## Deployment
 
 * Run `$ npm run build`
-* Then copy paste `dist` folder and `package.json` on your server
+* Then copy paste `dist` folder, `config` folder and `package.json` on your server
 * Run `$ npm install` from your server
 * Finally, run `$ npm run serve` to start server.
 * Note that you need to deploy the package `netcdfjs` in a sibling folder and have the data stored in a sibling folder called `data`.

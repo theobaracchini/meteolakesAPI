@@ -3,5 +3,5 @@
 module.exports = {
     mode: 'production',
     data_path: 'M:\\Online\\localExtraction\\wwwroot\\meteolac',
-    port: 4480
+    port: 80
 };
