@@ -12,12 +12,18 @@ function meteolakesError (statement, reason) {
     }
 }
 
-function to2DArray (array, colSize, rowSize) {
+function formatTable (array, colSize, rowSize) {
     let result = [];
     for (let rowPosition = 0; rowPosition < rowSize; rowPosition++) {
         for (let colPosition = 0; colPosition < colSize; colPosition++) {
             if (rowPosition === 0) { result.push([]); }
-            result[colPosition][rowPosition] = array[colPosition + rowPosition * colSize];
+            let value = array[colPosition + rowPosition * colSize];
+            if (value === -999) {
+                value = NaN;
+            } else {
+                value = value.toExponential(4);
+            }
+            result[colPosition][rowPosition] = value;
         }
     }
     return result;
@@ -53,9 +59,9 @@ function getCoordinatesIndex (xArray, yArray, x, y) {
     let finalM = -1;
     let finalN = -1;
 
-    meteolakesError(xArray.length === yArray.length &&
-        xArray[0][0] && yArray[0][0] &&
-        xArray[0].length === yArray[0].length, 'invalid coordinates array');
+    meteolakesError(xArray.length !== yArray.length ||
+        xArray[0][0] === undefined || yArray[0][0] === undefined ||
+        xArray[0].length !== yArray[0].length, 'invalid coordinates array');
 
     for (let m = 0; m < maxM; m++) {
         for (let n = 0; n < maxN; n++) {
@@ -92,7 +98,7 @@ function getFilePath (lake, time) {
 }
 
 module.exports.meteolakesError = meteolakesError;
-module.exports.to2DArray = to2DArray;
+module.exports.formatTable = formatTable;
 module.exports.getIndexFromValue = getIndexFromValue;
 module.exports.getFilePath = getFilePath;
 module.exports.getCoordinatesIndex = getCoordinatesIndex;

@@ -11,15 +11,14 @@ describe('MeteolakesAPI', () => {
             .get('/api/layer/geneva/temperature/1532314800000/200')
             .then(response => {
                 expect(response.statusCode).toBe(200);
-                expect(response.header['content-length']).toBe('51308');
                 expect(response.header['content-type']).toBe('text/csv; charset=utf-8');
 
                 let result = csvParser.parse(response.text).data;
                 expect(result.length).toBe(36 + 1); // there is one empty line at the end of the file, thus the array.
                 expect(result[0].length).toBe(182);
-                expect(result[0][0]).toBe('-999');
-                expect(result[17][111]).toBe('5.2369489669799805');
-                expect(result[25][164]).toBe('5.292830944061279');
+                expect(result[0][0]).toBe('NaN');
+                expect(result[17][111]).toBe('5.2369e+0');
+                expect(result[25][164]).toBe('5.2928e+0');
                 done();
             });
     });
@@ -29,15 +28,14 @@ describe('MeteolakesAPI', () => {
             .get('/api/layer/geneva/water_level/1532325600000')
             .then(response => {
                 expect(response.statusCode).toBe(200);
-                expect(response.header['content-length']).toBe('70705');
                 expect(response.header['content-type']).toBe('text/csv; charset=utf-8');
 
                 let result = csvParser.parse(response.text).data;
                 expect(result.length).toBe(36 + 1); // there is one empty line at the end of the file, thus the array.
                 expect(result[0].length).toBe(182);
-                expect(result[0][0]).toBe('0');
-                expect(result[29][70]).toBe('0.7508849501609802');
-                expect(result[8][145]).toBe('0.7336804866790771');
+                expect(result[0][0]).toBe('0.0000e+0');
+                expect(result[29][70]).toBe('7.5088e-1');
+                expect(result[8][145]).toBe('7.3368e-1');
                 done();
             });
     });
@@ -47,14 +45,13 @@ describe('MeteolakesAPI', () => {
             .get('/api/coordinates/516040/140140/geneva/temperature/1532336400000/1532509200000/100')
             .then(response => {
                 expect(response.statusCode).toBe(200);
-                expect(response.header['content-length']).toBe('307');
                 expect(response.header['content-type']).toBe('text/csv; charset=utf-8');
 
                 let result = csvParser.parse(response.text).data;
                 expect(result.length).toBe(1 + 1); // there is one empty line at the end of the file, thus the array.
                 expect(result[0].length).toBe(17);
-                expect(result[0][0]).toEqual('5.638596057891846');
-                expect(result[0][16]).toEqual('5.672296047210693');
+                expect(result[0][0]).toEqual('5.6386e+0');
+                expect(result[0][16]).toEqual('5.6723e+0');
                 done();
             });
     });
@@ -64,16 +61,15 @@ describe('MeteolakesAPI', () => {
             .get('/api/coordinates/516040/140140/geneva/temperature/1532509200000/1532682000000')
             .then(response => {
                 expect(response.statusCode).toBe(200);
-                expect(response.header['content-length']).toBe('15036');
                 expect(response.header['content-type']).toBe('text/csv; charset=utf-8');
 
                 let result = csvParser.parse(response.text).data;
                 expect(result.length).toBe(59 + 1);
                 expect(result[0].length).toBe(17);
-                expect(result[0][0]).toEqual('-999');
-                expect(result[16][0]).toEqual('5.672296047210693');
-                expect(result[29][15]).toEqual('7.2107744216918945');
-                expect(result[58][0]).toEqual('21.79770278930664');
+                expect(result[0][0]).toEqual('NaN');
+                expect(result[16][0]).toEqual('5.6723e+0');
+                expect(result[29][15]).toEqual('7.2108e+0');
+                expect(result[58][0]).toEqual('2.1798e+1');
                 done();
             });
     });

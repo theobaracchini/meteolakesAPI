@@ -30,8 +30,8 @@ class MeteolakesFile {
 
         this.timeArray = this.reader.getDataVariable(variables.TIME);
         this.depthArray = this.reader.getDataVariable(variables.DEPTH);
-        this.LongitudeArray = utils.to2DArray(this.reader.getDataVariable(variables.LONGITUDE), this.colSize, this.rowSize);
-        this.LatitudeArray = utils.to2DArray(this.reader.getDataVariable(variables.LATITUDE), this.colSize, this.rowSize);
+        this.longitudeArray = utils.formatTable(this.reader.getDataVariable(variables.LONGITUDE), this.colSize, this.rowSize);
+        this.latitudeArray = utils.formatTable(this.reader.getDataVariable(variables.LATITUDE), this.colSize, this.rowSize);
     }
 
     getVariable (variable, time, depth) {
@@ -56,14 +56,14 @@ class MeteolakesFile {
 
         logger.info(message);
 
-        return utils.to2DArray(result, this.colSize, this.rowSize);
+        return utils.formatTable(result, this.colSize, this.rowSize);
     }
 
     getValue (x, y, variable, startTime, endTime, depth) {
         let startTimeIndex = utils.getIndexFromValue(this.timeArray, dateUtils.transformDate(startTime));
         let endTimeIndex = utils.getIndexFromValue(this.timeArray, dateUtils.transformDate(endTime));
         let timeSize = endTimeIndex - startTimeIndex + 1;
-        let coordinates = utils.getCoordinatesIndex(this.LatitudeArray, this.LongitudeArray, x, y);
+        let coordinates = utils.getCoordinatesIndex(this.latitudeArray, this.longitudeArray, x, y);
         let colIndex = coordinates.N;
         let rowIndex = coordinates.M;
         let depthSize = 1;
@@ -88,7 +88,7 @@ class MeteolakesFile {
 
         logger.info(message);
 
-        return utils.to2DArray(result, depthSize, timeSize);
+        return utils.formatTable(result, depthSize, timeSize);
     }
 }
 

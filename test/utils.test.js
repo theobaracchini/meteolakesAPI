@@ -18,10 +18,10 @@ describe('utils module', () => {
     });
 
     test('should convert a 1 dimentional array into a 2 dimentional array', () => {
-        let init = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-        let expected = [[0, 3, 6], [1, 4, 7], [2, 5, 8]];
+        let init = [-999, 10935.8492, -999, 3234568.76, 4123.456767, 5, 6.345623, 7, -999];
+        let expected = [[NaN, '3.2346e+6', '6.3456e+0'], ['1.0936e+4', '4.1235e+3', '7.0000e+0'], [NaN, '5.0000e+0', NaN]];
 
-        expect(utils.to2DArray(init, 3, 3)).toEqual(expected);
+        expect(utils.formatTable(init, 3, 3)).toEqual(expected);
     });
 
     test('should find index of the closest value in an ordered array', () => {
