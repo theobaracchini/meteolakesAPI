@@ -97,8 +97,38 @@ function getFilePath (lake, time) {
     return filePath;
 }
 
+function addLabel (table, firstRow, firstCol) {
+    let result = [];
+    result.push(firstRow);
+
+    for (let i = 0; i < firstCol.length; i++) {
+        result.push([firstCol[i], ...table[i]]);
+    }
+
+    return result;
+}
+
+function getTimeLabel (timeArray, startIndex, endIndex) {
+    return ['depth\\time',
+        ...timeArray.slice(startIndex, endIndex + 1)
+            .map(d => {
+                let date = new Date(dateUtils.getJsTimestamp(d));
+                let month = date.getUTCMonth() + 1;
+                let hours = date.getUTCHours();
+                let minutes = date.getUTCMinutes();
+
+                month = month < 10 ? '0' + month : month;
+                hours = hours < 10 ? '0' + hours : hours;
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+
+                return `${date.getUTCDate()}/${month}/${date.getUTCFullYear()} ${hours}:${minutes}`;
+            })];
+}
+
 module.exports.meteolakesError = meteolakesError;
 module.exports.formatTable = formatTable;
 module.exports.getIndexFromValue = getIndexFromValue;
 module.exports.getFilePath = getFilePath;
 module.exports.getCoordinatesIndex = getCoordinatesIndex;
+module.exports.addLabel = addLabel;
+module.exports.getTimeLabel = getTimeLabel;

@@ -61,6 +61,26 @@ describe('utils module', () => {
 
         expect(utils.getCoordinatesIndex(latitudeCor, longitudeCor, x, y)).toEqual(expected);
     });
+
+    test('should add labels to a table', () => {
+        let array = [['a', 'b', 'c', 'd', 'e'], ['f', 'g', 'h', 'i', 'j'], ['k', 'l', 'm', 'n', 'o']];
+        let firstRow = ['depth\\time', '1234567', '2345678', '3456789', '4567890', '5678901'];
+        let firstCol = [200, 300, 400];
+        let expected =
+            [['depth\\time', '1234567', '2345678', '3456789', '4567890', '5678901'],
+                [200, 'a', 'b', 'c', 'd', 'e'],
+                [300, 'f', 'g', 'h', 'i', 'j'],
+                [400, 'k', 'l', 'm', 'n', 'o']];
+
+        expect(utils.addLabel(array, firstRow, firstCol)).toEqual(expected);
+    });
+
+    test('should create a time label array', () => {
+        let timeArray = [737348, 737348.125, 737348.25, 737348.375];
+        let expected = ['depth\\time', '15/10/2018 03:00', '15/10/2018 06:00'];
+
+        expect(utils.getTimeLabel(timeArray, 1, 2)).toEqual(expected);
+    });
 });
 
 describe('date module', () => {
@@ -69,6 +89,13 @@ describe('date module', () => {
         let expected = 719529;
 
         expect(dateUtils.transformDate(init)).toBe(expected);
+    });
+
+    test('should convert a matlab timestamp into a unix timestamp', () => {
+        let init = 719529;
+        let expected = 0;
+
+        expect(dateUtils.getJsTimestamp(init)).toBe(expected);
     });
 
     describe('should find week number', () => {

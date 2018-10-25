@@ -32,27 +32,31 @@ describe('meteolakesFile module', () => {
 
     test('should retrieve data of a given variable, depth and position on a specified time interval', () => {
         let result = file.getValue(532830, 144660, 'R1', 1539561600000, 1539594000000, 150);
-        let expected = [['5.4538e+0', '5.4525e+0', '5.4333e+0', '5.4398e+0']];
+        let expected = [['depth\\time', '15/10/2018 00:00', '15/10/2018 03:00', '15/10/2018 06:00', '15/10/2018 09:00'],
+            ['-150.4', '5.4538e+0', '5.4525e+0', '5.4333e+0', '5.4398e+0']];
 
         expect(result).toEqual(expected);
     });
 
     test('should retrieve data of a given variable and position on a specified time interval over all depths', () => {
         let result = file.getValue(532830, 144660, 'R1', 1539572400000, 1539583200000, 'all');
-        let expectedFirstLine = ['5.1550e+0', '5.1550e+0'];
-        let expectedLine12 = ['5.4525e+0', '5.4333e+0'];
-        let expectedLastLine = ['1.6121e+1', '1.6073e+1'];
+        let expectedLabelLine = ['depth\\time', '15/10/2018 03:00', '15/10/2018 06:00'];
+        let expectedFirstLine = ['-307.0', '5.1550e+0', '5.1550e+0'];
+        let expectedLine12 = ['-150.4', '5.4525e+0', '5.4333e+0'];
+        let expectedLastLine = ['-0.6', '1.6121e+1', '1.6073e+1'];
 
-        expect(result.length).toBe(59);
-        expect(result[0].length).toBe(2);
-        expect(result[0]).toEqual(expectedFirstLine);
-        expect(result[11]).toEqual(expectedLine12);
-        expect(result[58]).toEqual(expectedLastLine);
+        expect(result.length).toBe(59 + 1); // with label row
+        expect(result[0].length).toBe(2 + 1); // with label column
+        expect(result[0]).toEqual(expectedLabelLine);
+        expect(result[1]).toEqual(expectedFirstLine);
+        expect(result[12]).toEqual(expectedLine12);
+        expect(result[59]).toEqual(expectedLastLine);
     });
 
     test('should retrieve a given value of a given variable and position on a specified time interval', () => {
         let result = file.getValue(549315, 147210, 'S1', 1539561600000, 1539583200000);
-        let expected = [['1.1002e+0', '1.0994e+0', '1.1008e+0']];
+        let expected = [['depth\\time', '15/10/2018 00:00', '15/10/2018 03:00', '15/10/2018 06:00'],
+            ['/', '1.1002e+0', '1.0994e+0', '1.1008e+0']];
 
         expect(result).toEqual(expected);
     });

@@ -63,20 +63,26 @@ class MeteolakesFile {
         let startTimeIndex = utils.getIndexFromValue(this.timeArray, dateUtils.transformDate(startTime));
         let endTimeIndex = utils.getIndexFromValue(this.timeArray, dateUtils.transformDate(endTime));
         let timeSize = endTimeIndex - startTimeIndex + 1;
+
         let coordinates = utils.getCoordinatesIndex(this.latitudeArray, this.longitudeArray, x, y);
         let colIndex = coordinates.N;
         let rowIndex = coordinates.M;
+
+        let depthLabel = ['/'];
+
         let depthSize = 1;
         let message = '';
         let result = [];
 
         if ((depth || depth === 0) && depth !== 'all') {
             let depthIndex = utils.getIndexFromValue(this.depthArray, Math.abs(depth) * -1);
+            depthLabel = [this.depthArray[depthIndex].toFixed(1)];
             message = `Retrieve ${variable} data from file ${this.path} at position ` +
                 `(${startTimeIndex}-${endTimeIndex}, ${depthIndex}, ${rowIndex}, ${colIndex}) (initial index = 0)`;
             result = this.reader.getDataVariableFiltered(variable, startTimeIndex, timeSize, depthIndex, depthSize, rowIndex, 1, colIndex, 1);
         } else if (depth === 'all') {
             depthSize = this.depthArray.length;
+            depthLabel = this.depthArray.map(d => d.toFixed(1));
             message = `Retrieve ${variable} data from file ${this.path} at position ` +
                 `(${startTimeIndex}-${endTimeIndex}, 0-${depthSize}, ${rowIndex}, ${colIndex}) (initial index = 0)`;
             result = this.reader.getDataVariableFiltered(variable, startTimeIndex, timeSize, 0, depthSize, rowIndex, 1, colIndex, 1);
@@ -88,7 +94,10 @@ class MeteolakesFile {
 
         logger.info(message);
 
-        return utils.formatTable(result, depthSize, timeSize);
+        let table = utils.formatTable(result, depthSize, timeSize);
+        let timeLabel = utils.getTimeLabel(this.timeArray, startTimeIndex, endTimeIndex);
+
+        return utils.addLabel(table, timeLabel, depthLabel);
     }
 }
 

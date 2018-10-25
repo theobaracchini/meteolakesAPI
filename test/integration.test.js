@@ -48,10 +48,10 @@ describe('MeteolakesAPI', () => {
                 expect(response.header['content-type']).toBe('text/csv; charset=utf-8');
 
                 let result = csvParser.parse(response.text).data;
-                expect(result.length).toBe(1 + 1); // there is one empty line at the end of the file, thus the array.
-                expect(result[0].length).toBe(17);
-                expect(result[0][0]).toEqual('5.6386e+0');
-                expect(result[0][16]).toEqual('5.6723e+0');
+                expect(result.length).toBe(2 + 1); // there is one empty line at the end of the file, thus the array.
+                expect(result[0].length).toBe(18);
+                expect(result[1][1]).toEqual('5.6386e+0');
+                expect(result[1][17]).toEqual('5.6723e+0');
                 done();
             });
     });
@@ -64,12 +64,12 @@ describe('MeteolakesAPI', () => {
                 expect(response.header['content-type']).toBe('text/csv; charset=utf-8');
 
                 let result = csvParser.parse(response.text).data;
-                expect(result.length).toBe(59 + 1);
-                expect(result[0].length).toBe(17);
-                expect(result[0][0]).toEqual('NaN');
-                expect(result[16][0]).toEqual('5.6723e+0');
-                expect(result[29][15]).toEqual('7.2108e+0');
-                expect(result[58][0]).toEqual('2.1798e+1');
+                expect(result.length).toBe(60 + 1);
+                expect(result[0].length).toBe(18);
+                expect(result[1][1]).toEqual('NaN');
+                expect(result[17][1]).toEqual('5.6723e+0');
+                expect(result[30][16]).toEqual('7.2108e+0');
+                expect(result[59][1]).toEqual('2.1798e+1');
                 done();
             });
     });

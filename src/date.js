@@ -1,11 +1,14 @@
 'use-strict';
 
 const MILISECONDS_IN_DAY = 86400000;
+const JSZERO = 719529;
 
 function transformDate (jsTimestamp) {
-    const jsZero = 719529;
-    let result = jsTimestamp / MILISECONDS_IN_DAY + jsZero;
-    return result;
+    return jsTimestamp / MILISECONDS_IN_DAY + JSZERO;
+}
+
+function getJsTimestamp (matlabTimestamp) {
+    return (matlabTimestamp - JSZERO) * MILISECONDS_IN_DAY;
 }
 
 function getDateDetails (date) {
@@ -44,4 +47,5 @@ function findSunday (date) {
 }
 
 module.exports.transformDate = transformDate;
+module.exports.getJsTimestamp = getJsTimestamp;
 module.exports.getDateDetails = getDateDetails;
