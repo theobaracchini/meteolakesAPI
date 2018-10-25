@@ -4,7 +4,6 @@ const csv = require('csv-express'); // eslint-disable-line no-unused-vars
 const express = require('express');
 const helmet = require('helmet');
 const controller = require('controller');
-const config = require('config/config')();
 const log = require('logger');
 const morgan = log.morgan;
 const logger = log.logger;
@@ -15,28 +14,28 @@ app.use(morgan);
 
 app.use(helmet());
 
-app.get('/api/:lake/:variable/:time/:depth', (req, res) => {
-    res.setHeader('Content-disposition', `attachment; filename=${(new Date(Date.now())).toISOString()}_${req.params.variable}_data.csv`);
+app.get('/api/layer/:lake/:variable/:time/:depth', (req, res) => {
+    res.setHeader('Content-disposition', `attachment; filename=${(new Date(req.params.time)).toISOString()}_${req.params.lake}_${req.params.variable}_layer.csv`);
     res.set('Content-Type', 'text/csv');
     res.csv(controller.getVariable(req.params.lake, req.params.variable, req.params.time, req.params.depth));
 });
 
-app.get('/api/:lake/:variable/:time/', (req, res) => {
-    res.setHeader('Content-disposition', `attachment; filename=${(new Date(Date.now())).toISOString()}_${req.params.variable}_data.csv`);
+app.get('/api/layer/:lake/:variable/:time/', (req, res) => {
+    res.setHeader('Content-disposition', `attachment; filename=${(new Date(req.params.time)).toISOString()}_${req.params.lake}_${req.params.variable}_layer.csv`);
     res.set('Content-Type', 'text/csv');
     res.csv(controller.getVariable(req.params.lake, req.params.variable, req.params.time));
 });
 
-app.get('/api/:lake/:variable/:time/:depth/:x/:y', (req, res) => {
-    res.setHeader('Content-disposition', `attachment; filename=${(new Date(Date.now())).toISOString()}_${req.params.variable}_value.csv`);
+app.get('/api/coordinates/:x/:y/:lake/:variable/:startTime/:endTime', (req, res) => {
+    res.setHeader('Content-disposition', `attachment; filename=${(new Date(Date.now())).toISOString()}_${req.params.variable}_coor-${req.params.x}-${req.params.y}.csv`);
     res.set('Content-Type', 'text/csv');
-    res.send(controller.getValue(req.params.lake, req.params.variable, req.params.time, req.params.depth, req.params.x, req.params.y).toString());
+    res.csv(controller.getValue(req.params.x, req.params.y, req.params.lake, req.params.variable, req.params.startTime, req.params.endTime));
 });
 
-app.get('/api/:lake/:variable/:time/:x/:y', (req, res) => {
-    res.setHeader('Content-disposition', `attachment; filename=${(new Date(Date.now())).toISOString()}_${req.params.variable}_value.csv`);
+app.get('/api/coordinates/:x/:y/:lake/:variable/:startTime/:endTime/:depth', (req, res) => {
+    res.setHeader('Content-disposition', `attachment; filename=${(new Date(Date.now())).toISOString()}_${req.params.variable}_coor-${req.params.x}-${req.params.y}.csv`);
     res.set('Content-Type', 'text/csv');
-    res.send(controller.getValue(req.params.lake, req.params.variable, req.params.time, null, req.params.x, req.params.y).toString());
+    res.csv(controller.getValue(req.params.x, req.params.y, req.params.lake, req.params.variable, req.params.startTime, req.params.endTime, req.params.depth));
 });
 
 app.use(function (err, req, res, next) {
@@ -46,10 +45,6 @@ app.use(function (err, req, res, next) {
         statusCode = 400;
     }
     res.status(statusCode).send(err.message);
-});
-
-app.listen(config.port, () => {
-    logger.info(`Meteolakes API listening on port ${config.port} in ${config.mode} mode!`);
 });
 
 module.exports = app;

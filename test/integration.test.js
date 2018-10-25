@@ -6,9 +6,9 @@ const csvParser = require('papaparse');
 // const logger = require('logger').logger;
 
 describe('MeteolakesAPI', () => {
-    test('should GET /api/:lake/:variable/:time/:depth', () => {
-        return request(app)
-            .get('/api/geneva/temperature/1532314800000/200')
+    test('should GET /api/layer/:lake/:variable/:time/:depth', (done) => {
+        request(app)
+            .get('/api/layer/geneva/temperature/1532314800000/200')
             .then(response => {
                 expect(response.statusCode).toBe(200);
                 expect(response.header['content-length']).toBe('51308');
@@ -20,12 +20,13 @@ describe('MeteolakesAPI', () => {
                 expect(result[0][0]).toBe('-999');
                 expect(result[17][111]).toBe('5.2369489669799805');
                 expect(result[25][164]).toBe('5.292830944061279');
+                done();
             });
     });
 
-    test('should GET /api/:lake/:variable/:time', () => {
-        return request(app)
-            .get('/api/geneva/water_level/1532325600000')
+    test('should GET /api/layer/:lake/:variable/:time', (done) => {
+        request(app)
+            .get('/api/layer/geneva/water_level/1532325600000')
             .then(response => {
                 expect(response.statusCode).toBe(200);
                 expect(response.header['content-length']).toBe('70705');
@@ -37,97 +38,139 @@ describe('MeteolakesAPI', () => {
                 expect(result[0][0]).toBe('0');
                 expect(result[29][70]).toBe('0.7508849501609802');
                 expect(result[8][145]).toBe('0.7336804866790771');
+                done();
             });
     });
 
-    test('should GET /api/:lake/:variable/:time/:depth/:x/:y', () => {
-        return request(app)
-            .get('/api/geneva/temperature/1532336400000/100/516040/140140')
+    test('should GET /api/coordinates/:x/:y/:lake/:variable/:startTime/:endTime/:depth', (done) => {
+        request(app)
+            .get('/api/coordinates/516040/140140/geneva/temperature/1532336400000/1532509200000/100')
             .then(response => {
                 expect(response.statusCode).toBe(200);
-                expect(response.header['content-length']).toBe('17');
+                expect(response.header['content-length']).toBe('307');
                 expect(response.header['content-type']).toBe('text/csv; charset=utf-8');
 
                 let result = csvParser.parse(response.text).data;
-                expect(result.length).toBe(1);
-                expect(result).toEqual([['5.638596057891846']]);
+                expect(result.length).toBe(1 + 1); // there is one empty line at the end of the file, thus the array.
+                expect(result[0].length).toBe(17);
+                expect(result[0][0]).toEqual('5.638596057891846');
+                expect(result[0][16]).toEqual('5.672296047210693');
+                done();
             });
     });
 
-    test('should GET /api/:lake/:variable/:time/:x/:y', () => {
-        return request(app)
-            .get('/api/geneva/water_level/1532347200000/541000/145600')
+    test('should GET /api/coordinates/:x/:y/:lake/:variable/:startTime/:endTime/', (done) => {
+        request(app)
+            .get('/api/coordinates/516040/140140/geneva/temperature/1532509200000/1532682000000')
             .then(response => {
                 expect(response.statusCode).toBe(200);
-                expect(response.header['content-length']).toBe('18');
+                expect(response.header['content-length']).toBe('15036');
                 expect(response.header['content-type']).toBe('text/csv; charset=utf-8');
 
                 let result = csvParser.parse(response.text).data;
-                expect(result.length).toBe(1);
-                expect(result).toEqual([['0.7352995872497559']]);
+                expect(result.length).toBe(59 + 1);
+                expect(result[0].length).toBe(17);
+                expect(result[0][0]).toEqual('-999');
+                expect(result[16][0]).toEqual('5.672296047210693');
+                expect(result[29][15]).toEqual('7.2107744216918945');
+                expect(result[58][0]).toEqual('21.79770278930664');
+                done();
             });
     });
 
-    test('should not work with an invalid variable name', () => {
-        return request(app)
-            .get('/api/geneva/wrong_variable/1532325600000')
+    test('should not work with an invalid variable name', (done) => {
+        request(app)
+            .get('/api/layer/geneva/wrong_variable/1532325600000')
             .expect(400)
-            .expect('Error occured during Meteolakes API call: invalid variable argument');
+            .expect('Error occured during Meteolakes API call: invalid variable argument')
+            .then(() => done());
     });
 
-    test('should not work with an invalid lake name', () => {
-        return request(app)
-            .get('/api/lake/water_level/1532325600000')
+    test('should not work with an invalid lake name', (done) => {
+        request(app)
+            .get('/api/layer/lake/water_level/1532325600000')
             .expect(400)
-            .expect('Error occured during Meteolakes API call: ENOENT: no such file or directory, open \'D:\\Dan\\workspace\\data_lake\\2018\\netcdf\\lake_2018_week30.nc\'');
+            .expect('Error occured during Meteolakes API call: ENOENT: no such file or directory, open \'D:\\Dan\\workspace\\data_lake\\2018\\netcdf\\lake_2018_week30.nc\'')
+            .then(() => done());
     });
 
-    test('should not work with an invalid timestamp', () => {
-        return request(app)
-            .get('/api/geneva/water_level/timestamp')
+    test('should not work with an invalid timestamp', (done) => {
+        request(app)
+            .get('/api/layer/geneva/water_level/timestamp')
             .expect(400)
-            .expect('Error occured during Meteolakes API call: invalid time argument');
+            .expect('Error occured during Meteolakes API call: invalid time argument')
+            .then(() => done());
     });
 
-    test('should not work with a too big or too small timestamp', () => {
-        return request(app)
-            .get('/api/geneva/water_level/123456789')
+    test('should not work with a too big or too small timestamp', (done) => {
+        request(app)
+            .get('/api/layer/geneva/water_level/123456789')
             .expect(400)
-            .expect('Error occured during Meteolakes API call: ENOENT: no such file or directory, open \'D:\\Dan\\workspace\\data\\1970\\netcdf\\geneva_1970_week1.nc\'');
+            .expect('Error occured during Meteolakes API call: ENOENT: no such file or directory, open \'D:\\Dan\\workspace\\data\\1970\\netcdf\\geneva_1970_week1.nc\'')
+            .then(() => done());
     });
 
-    test('should not work with an invalid depth', () => {
-        return request(app)
-            .get('/api/geneva/temperature/1532325600000/depth')
+    test('should not work with an invalid depth', (done) => {
+        request(app)
+            .get('/api/layer/geneva/temperature/1532325600000/depth')
             .expect(400)
-            .expect('Error occured during Meteolakes API call: invalid depth argument');
+            .expect('Error occured during Meteolakes API call: invalid depth argument')
+            .then(() => done());
     });
 
-    test('should not work if depth is required', () => {
-        return request(app)
-            .get('/api/geneva/temperature/1532325600000')
+    test('should not work if depth is required', (done) => {
+        request(app)
+            .get('/api/layer/geneva/temperature/1532325600000')
             .expect(400)
-            .expect('Error occured during Meteolakes API call: variable R1 requires depth value');
+            .expect('Error occured during Meteolakes API call: variable R1 requires depth value')
+            .then(() => done());
     });
 
-    test('should not work with invalid x coordinate', () => {
-        return request(app)
-            .get('/api/geneva/water_level/1532325600000/x/123456')
+    test('should not work with invalid x coordinate', (done) => {
+        request(app)
+            .get('/api/coordinates/x/123456/geneva/water_level/1532325600000/1532325600000')
             .expect(400)
-            .expect('Error occured during Meteolakes API call: invalid x argument');
+            .expect('Error occured during Meteolakes API call: invalid x argument')
+            .then(() => done());
     });
 
-    test('should not work with invalid y coordinate', () => {
-        return request(app)
-            .get('/api/geneva/temperature/1532325600000/200/563241/y')
+    test('should not work with invalid y coordinate', (done) => {
+        request(app)
+            .get('/api/coordinates/563241/y/geneva/temperature/1532325600000/1532325600000/200')
             .expect(400)
-            .expect('Error occured during Meteolakes API call: invalid y argument');
+            .expect('Error occured during Meteolakes API call: invalid y argument')
+            .then(() => done());
     });
 
-    test('should not work if coordinates are too far away from the lake', () => {
-        return request(app)
-            .get('/api/geneva/temperature/1532325600000/150/500000/100000')
+    test('should not work if coordinates are too far away from the lake', (done) => {
+        request(app)
+            .get('/api/coordinates/500000/100000/geneva/temperature/1532325600000/1532325600000')
             .expect(400)
-            .expect('Error occured during Meteolakes API call: specified coordinates outside the lake');
+            .expect('Error occured during Meteolakes API call: specified coordinates outside the lake')
+            .then(() => done());
+    });
+
+    test('should not work with invalid start timestamp', (done) => {
+        request(app)
+            .get('/api/coordinates/516040/140140/geneva/temperature/time/1532682000000')
+            .expect(400)
+            .expect('Error occured during Meteolakes API call: invalid start time argument')
+            .then(() => done());
+    });
+
+    test('should not work with invalid start timestamp', (done) => {
+        request(app)
+            .get('/api/coordinates/516040/140140/geneva/temperature/1532682000000/time')
+            .expect(400)
+            .expect('Error occured during Meteolakes API call: invalid end time argument')
+            .then(() => done());
+    });
+
+    test('should not work with two timestamps from different files', (done) => {
+        request(app)
+            .get('/api/coordinates/516040/140140/geneva/water_level/1532682000000/1532995200000')
+            .expect(400)
+            .expect('Error occured during Meteolakes API call: start time and end time do not belong to the same week')
+            .then(() => done());
     });
 });

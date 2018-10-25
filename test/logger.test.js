@@ -6,7 +6,7 @@ describe('logger module', () => {
     test('should have level info', () => {
         expect(logger.level).toBe('info');
     });
-    test('should have two transport', () => {
-        expect(logger.transports.length).toBe(2);
+    test('should have one transport', () => {
+        expect(logger.transports.length).toBe(1);
     });
 });

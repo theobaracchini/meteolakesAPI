@@ -2,13 +2,13 @@
   "name": "api",
   "version": "1.0.0",
   "description": "meteolakes back end service",
-  "main": "src/app.js",
+  "main": "src/server.js",
   "scripts": {
     "build": "babel src -d dist",
     "coverage": "jest --coverage",
     "eslint": "eslint src test",
-    "serve": "node dist/app.js",
-    "start": "nodemon --exec babel-node src/app.js",
+    "serve": "node dist/server.js",
+    "start": "nodemon --exec babel-node src/server.js",
     "test": "npm run test-jest && npm run eslint",
     "test-jest": "jest --silent"
   },

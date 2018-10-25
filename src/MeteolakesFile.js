@@ -59,31 +59,36 @@ class MeteolakesFile {
         return utils.to2DArray(result, this.colSize, this.rowSize);
     }
 
-    getValue (variable, time, depth, x, y) {
-        let timeIndex = utils.getIndexFromValue(this.timeArray, dateUtils.transformDate(time));
+    getValue (x, y, variable, startTime, endTime, depth) {
+        let startTimeIndex = utils.getIndexFromValue(this.timeArray, dateUtils.transformDate(startTime));
+        let endTimeIndex = utils.getIndexFromValue(this.timeArray, dateUtils.transformDate(endTime));
+        let timeSize = endTimeIndex - startTimeIndex + 1;
         let coordinates = utils.getCoordinatesIndex(this.LatitudeArray, this.LongitudeArray, x, y);
         let colIndex = coordinates.N;
         let rowIndex = coordinates.M;
-        let startIndex = 0;
+        let depthSize = 1;
         let message = '';
+        let result = [];
 
-        if (depth !== null) {
+        if ((depth || depth === 0) && depth !== 'all') {
             let depthIndex = utils.getIndexFromValue(this.depthArray, Math.abs(depth) * -1);
-            startIndex = timeIndex * this.depthSize * this.colSize * this.rowSize +
-                depthIndex * this.colSize * this.rowSize + rowIndex * this.colSize + colIndex;
             message = `Retrieve ${variable} data from file ${this.path} at position ` +
-                `(${timeIndex}, ${depthIndex}, ${rowIndex}, ${colIndex}) (initial index = 0)`;
+                `(${startTimeIndex}-${endTimeIndex}, ${depthIndex}, ${rowIndex}, ${colIndex}) (initial index = 0)`;
+            result = this.reader.getDataVariableFiltered(variable, startTimeIndex, timeSize, depthIndex, depthSize, rowIndex, 1, colIndex, 1);
+        } else if (depth === 'all') {
+            depthSize = this.depthArray.length;
+            message = `Retrieve ${variable} data from file ${this.path} at position ` +
+                `(${startTimeIndex}-${endTimeIndex}, 0-${depthSize}, ${rowIndex}, ${colIndex}) (initial index = 0)`;
+            result = this.reader.getDataVariableFiltered(variable, startTimeIndex, timeSize, 0, depthSize, rowIndex, 1, colIndex, 1);
         } else {
-            startIndex = timeIndex * this.colSize * this.rowSize + rowIndex * this.colSize + colIndex;
             message = `Retrieve ${variable} data from file ${this.path} at position ` +
-            `(${timeIndex}, ${rowIndex}, ${colIndex}) (initial index = 0)`;
+                `(${startTimeIndex}-${endTimeIndex}, ${rowIndex}, ${colIndex}) (initial index = 0)`;
+            result = this.reader.getDataVariableFiltered(variable, startTimeIndex, timeSize, rowIndex, 1, colIndex, 1);
         }
-
-        let result = this.reader.getDataVariableSlice(variable, startIndex, 1);
 
         logger.info(message);
 
-        return result;
+        return utils.to2DArray(result, depthSize, timeSize);
     }
 }
 

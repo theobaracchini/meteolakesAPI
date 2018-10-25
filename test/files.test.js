@@ -30,15 +30,30 @@ describe('meteolakesFile module', () => {
         expect(result[24][180]).toBe(1.101495385169983);
     });
 
-    test('should retrieve a given value of a given variable, time, depth and position', () => {
-        let result = file.getValue('R1', 1539583200000, 150, 532830, 144660);
+    test('should retrieve data of a given variable, depth and position on a specified time interval', () => {
+        let result = file.getValue(532830, 144660, 'R1', 1539561600000, 1539594000000, 150);
+        let expected = [[5.453780174255371, 5.4524993896484375, 5.433284282684326, 5.439808368682861]];
 
-        expect(result).toEqual([5.433284282684326]);
+        expect(result).toEqual(expected);
     });
 
-    test('should retrieve a given value of a given variable, time and position', () => {
-        let result = file.getValue('S1', 1539561600000, null, 549315, 147210);
+    test('should retrieve data of a given variable and position on a specified time interval over all depths', () => {
+        let result = file.getValue(532830, 144660, 'R1', 1539572400000, 1539583200000, 'all');
+        let expectedFirstLine = [5.155029773712158, 5.154991626739502];
+        let expectedLine12 = [5.4524993896484375, 5.433284282684326];
+        let expectedLastLine = [16.120973587036133, 16.072689056396484];
 
-        expect(result).toEqual([1.1001896858215332]);
+        expect(result.length).toBe(59);
+        expect(result[0].length).toBe(2);
+        expect(result[0]).toEqual(expectedFirstLine);
+        expect(result[11]).toEqual(expectedLine12);
+        expect(result[58]).toEqual(expectedLastLine);
+    });
+
+    test('should retrieve a given value of a given variable and position on a specified time interval', () => {
+        let result = file.getValue(549315, 147210, 'S1', 1539561600000, 1539583200000);
+        let expected = [[1.1001896858215332, 1.099381685256958, 1.100839614868164]];
+
+        expect(result).toEqual(expected);
     });
 });
