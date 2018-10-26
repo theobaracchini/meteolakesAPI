@@ -11,7 +11,7 @@ beforeAll(() => {
 
 describe('meteolakesFile module', () => {
     test('should retrieve a given variable data a specific time and specific depth', () => {
-        let result = file.getVariable('R1', 1539572400000, 200);
+        let result = file.getLayer('R1', 1539572400000, 200);
 
         expect(result.length).toBe(36);
         expect(result[0].length).toBe(182);
@@ -21,7 +21,7 @@ describe('meteolakesFile module', () => {
     });
 
     test('should retrieve a given variable data a specific time', () => {
-        let result = file.getVariable('S1', 1539594000000);
+        let result = file.getLayer('S1', 1539594000000);
 
         expect(result.length).toBe(36);
         expect(result[0].length).toBe(182);

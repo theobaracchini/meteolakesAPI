@@ -5,15 +5,15 @@ const variables = require('enum/variables');
 const utils = require('utils');
 const date = require('date');
 
-function getVariable (lake, variable, time, depth) {
+function getLayer (lake, variable, time, depth) {
     let properties = checkProperties(variable, time, depth);
 
     const file = new MeteolakesFile(utils.getFilePath(lake, properties.time));
 
-    return file.getVariable(properties.variable, properties.time, properties.depth);
+    return file.getLayer(properties.variable, properties.time, properties.depth);
 }
 
-function getValue (x, y, lake, variable, startTime, endTime, depth) {
+function getTableFromCoordinates (x, y, lake, variable, startTime, endTime, depth) {
     let properties = checkProperties(variable, null, depth);
     let time = checkTime(startTime, endTime);
     let coordinates = checkCoordinates(x, y);
@@ -74,5 +74,5 @@ function checkCoordinates (x, y) {
     return { x, y };
 }
 
-module.exports.getVariable = getVariable;
-module.exports.getValue = getValue;
+module.exports.getLayer = getLayer;
+module.exports.getTableFromCoordinates = getTableFromCoordinates;

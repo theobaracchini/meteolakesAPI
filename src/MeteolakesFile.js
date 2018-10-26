@@ -34,7 +34,7 @@ class MeteolakesFile {
         this.latitudeArray = utils.formatTable(this.colSize, this.rowSize, this.reader.getDataVariable(variables.LATITUDE));
     }
 
-    getVariable (variable, time, depth) {
+    getLayer (variable, time, depth) {
         let size = this.colSize * this.rowSize;
 
         let timeIndex = utils.getIndexFromValue(this.timeArray, dateUtils.transformDate(time));

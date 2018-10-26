@@ -17,25 +17,25 @@ app.use(helmet());
 app.get('/api/layer/:lake/:variable/:time/:depth', (req, res) => {
     res.setHeader('Content-disposition', `attachment; filename=Layer_${req.params.lake}_${req.params.variable}_${req.params.depth}_${req.params.time}.csv`);
     res.set('Content-Type', 'text/csv');
-    res.csv(controller.getVariable(req.params.lake, req.params.variable, req.params.time, req.params.depth));
+    res.csv(controller.getLayer(req.params.lake, req.params.variable, req.params.time, req.params.depth));
 });
 
 app.get('/api/layer/:lake/:variable/:time/', (req, res) => {
     res.setHeader('Content-disposition', `attachment; filename=Layer_${req.params.lake}_${req.params.variable}_${req.params.time}.csv`);
     res.set('Content-Type', 'text/csv');
-    res.csv(controller.getVariable(req.params.lake, req.params.variable, req.params.time));
+    res.csv(controller.getLayer(req.params.lake, req.params.variable, req.params.time));
 });
 
 app.get('/api/coordinates/:x/:y/:lake/:variable/:startTime/:endTime', (req, res) => {
     res.setHeader('Content-disposition', `attachment; filename=Table_${req.params.lake}_${req.params.variable}_coor-${req.params.x}-${req.params.y}_from${req.params.startTime}_to${req.params.endTime}.csv`);
     res.set('Content-Type', 'text/csv');
-    res.csv(controller.getValue(req.params.x, req.params.y, req.params.lake, req.params.variable, req.params.startTime, req.params.endTime));
+    res.csv(controller.getTableFromCoordinates(req.params.x, req.params.y, req.params.lake, req.params.variable, req.params.startTime, req.params.endTime));
 });
 
 app.get('/api/coordinates/:x/:y/:lake/:variable/:startTime/:endTime/:depth', (req, res) => {
     res.setHeader('Content-disposition', `attachment; filename=Table_${req.params.lake}_${req.params.variable}_coor-${req.params.x}-${req.params.y}_from${req.params.startTime}_to${req.params.endTime}.csv`);
     res.set('Content-Type', 'text/csv');
-    res.csv(controller.getValue(req.params.x, req.params.y, req.params.lake, req.params.variable, req.params.startTime, req.params.endTime, req.params.depth));
+    res.csv(controller.getTableFromCoordinates(req.params.x, req.params.y, req.params.lake, req.params.variable, req.params.startTime, req.params.endTime, req.params.depth));
 });
 
 app.use(function (err, req, res, next) {
