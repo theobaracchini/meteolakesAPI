@@ -17,11 +17,21 @@ describe('utils module', () => {
         }).not.toThrow();
     });
 
-    test('should convert a 1 dimentional array into a 2 dimentional array', () => {
+    test('should convert a 1D array into a 2D array', () => {
         let init = [-999, 10935.8492, -999, 3234568.76, 4123.456767, 5, 6.345623, 7, -999];
         let expected = [[NaN, '3.2346e+6', '6.3456e+0'], ['1.0936e+4', '4.1235e+3', '7.0000e+0'], [NaN, '5.0000e+0', NaN]];
 
-        expect(utils.formatTable(init, 3, 3)).toEqual(expected);
+        expect(utils.formatTable(3, 3, init)).toEqual(expected);
+    });
+
+    test('should convert two 1D array into a 2D array', () => {
+        let init1 = [-999, 10935.8492, -999, 3234568.76, 4123.456767, 5, 6.345623, 7.256, -999];
+        let init2 = [-999, 13652.4562, -999, 3147858.85, 4352.761258, 5.3658, 6.785632, 7, -999];
+        let expected = [['(NaN, NaN)', '(3.2346e+6, 3.1479e+6)', '(6.3456e+0, 6.7856e+0)'],
+            ['(1.0936e+4, 1.3652e+4)', '(4.1235e+3, 4.3528e+3)', '(7.2560e+0, 7.0000e+0)'],
+            ['(NaN, NaN)', '(5.0000e+0, 5.3658e+0)', '(NaN, NaN)']];
+
+        expect(utils.formatTable(3, 3, init1, init2)).toEqual(expected);
     });
 
     test('should find index of the closest value in an ordered array', () => {
@@ -74,13 +84,6 @@ describe('utils module', () => {
 
         expect(utils.addLabel(array, firstRow, firstCol)).toEqual(expected);
     });
-
-    test('should create a time label array', () => {
-        let timeArray = [737348, 737348.125, 737348.25, 737348.375];
-        let expected = ['depth\\time', '15/10/2018 03:00', '15/10/2018 06:00'];
-
-        expect(utils.getTimeLabel(timeArray, 1, 2)).toEqual(expected);
-    });
 });
 
 describe('date module', () => {
@@ -96,6 +99,13 @@ describe('date module', () => {
         let expected = 0;
 
         expect(dateUtils.getJsTimestamp(init)).toBe(expected);
+    });
+
+    test('should create a time label array', () => {
+        let timeArray = [737342, 737342.125, 737342.25, 737342.375];
+        let expected = ['depth\\time', '09/10/2018 03:00', '09/10/2018 06:00'];
+
+        expect(dateUtils.getTimeLabel(timeArray, 1, 2)).toEqual(expected);
     });
 
     describe('should find week number', () => {

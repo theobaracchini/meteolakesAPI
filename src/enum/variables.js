@@ -6,5 +6,6 @@ module.exports = {
     TIME: 'time',
     DEPTH: 'ZK',
     LONGITUDE: 'YCOR',
-    LATITUDE: 'XCOR'
+    LATITUDE: 'XCOR',
+    VELOCITY: 'velocity'
 };

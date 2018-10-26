@@ -12,21 +12,30 @@ function meteolakesError (statement, reason) {
     }
 }
 
-function formatTable (array, colSize, rowSize) {
+function formatTable (colSize, rowSize, array1, array2) {
     let result = [];
+    let value = '';
     for (let rowPosition = 0; rowPosition < rowSize; rowPosition++) {
         for (let colPosition = 0; colPosition < colSize; colPosition++) {
             if (rowPosition === 0) { result.push([]); }
-            let value = array[colPosition + rowPosition * colSize];
-            if (value === -999) {
-                value = NaN;
+            if (array2) {
+                value = `(${formatValue(array1[colPosition + rowPosition * colSize])}, ` +
+                    `${formatValue(array2[colPosition + rowPosition * colSize])})`;
             } else {
-                value = value.toExponential(4);
+                value = formatValue(array1[colPosition + rowPosition * colSize]);
             }
             result[colPosition][rowPosition] = value;
         }
     }
     return result;
+}
+
+function formatValue (value) {
+    if (value === -999) {
+        return NaN;
+    } else {
+        return value.toExponential(4);
+    }
 }
 
 function getIndexFromValue (array, value) {
@@ -108,27 +117,9 @@ function addLabel (table, firstRow, firstCol) {
     return result;
 }
 
-function getTimeLabel (timeArray, startIndex, endIndex) {
-    return ['depth\\time',
-        ...timeArray.slice(startIndex, endIndex + 1)
-            .map(d => {
-                let date = new Date(dateUtils.getJsTimestamp(d));
-                let month = date.getUTCMonth() + 1;
-                let hours = date.getUTCHours();
-                let minutes = date.getUTCMinutes();
-
-                month = month < 10 ? '0' + month : month;
-                hours = hours < 10 ? '0' + hours : hours;
-                minutes = minutes < 10 ? '0' + minutes : minutes;
-
-                return `${date.getUTCDate()}/${month}/${date.getUTCFullYear()} ${hours}:${minutes}`;
-            })];
-}
-
 module.exports.meteolakesError = meteolakesError;
 module.exports.formatTable = formatTable;
 module.exports.getIndexFromValue = getIndexFromValue;
 module.exports.getFilePath = getFilePath;
 module.exports.getCoordinatesIndex = getCoordinatesIndex;
 module.exports.addLabel = addLabel;
-module.exports.getTimeLabel = getTimeLabel;

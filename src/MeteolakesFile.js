@@ -30,8 +30,8 @@ class MeteolakesFile {
 
         this.timeArray = this.reader.getDataVariable(variables.TIME);
         this.depthArray = this.reader.getDataVariable(variables.DEPTH);
-        this.longitudeArray = utils.formatTable(this.reader.getDataVariable(variables.LONGITUDE), this.colSize, this.rowSize);
-        this.latitudeArray = utils.formatTable(this.reader.getDataVariable(variables.LATITUDE), this.colSize, this.rowSize);
+        this.longitudeArray = utils.formatTable(this.colSize, this.rowSize, this.reader.getDataVariable(variables.LONGITUDE));
+        this.latitudeArray = utils.formatTable(this.colSize, this.rowSize, this.reader.getDataVariable(variables.LATITUDE));
     }
 
     getVariable (variable, time, depth) {
@@ -56,33 +56,56 @@ class MeteolakesFile {
 
         logger.info(message);
 
-        return utils.formatTable(result, this.colSize, this.rowSize);
+        return utils.formatTable(this.colSize, this.rowSize, result);
     }
 
-    getValue (x, y, variable, startTime, endTime, depth) {
-        let startTimeIndex = utils.getIndexFromValue(this.timeArray, dateUtils.transformDate(startTime));
-        let endTimeIndex = utils.getIndexFromValue(this.timeArray, dateUtils.transformDate(endTime));
-        let timeSize = endTimeIndex - startTimeIndex + 1;
+    getTable (x, y, variable, startTime, endTime, depth) {
+        let table = [];
 
         let coordinates = utils.getCoordinatesIndex(this.latitudeArray, this.longitudeArray, x, y);
         let colIndex = coordinates.N;
         let rowIndex = coordinates.M;
 
-        let depthLabel = ['/'];
+        let startTimeIndex = utils.getIndexFromValue(this.timeArray, dateUtils.transformDate(startTime));
+        let endTimeIndex = utils.getIndexFromValue(this.timeArray, dateUtils.transformDate(endTime));
+        let timeSize = endTimeIndex - startTimeIndex + 1;
 
+        let depthLabel = ['/'];
         let depthSize = 1;
+        let depthIndex;
+
+        if ((depth || depth === 0) && depth !== 'all') {
+            depthIndex = utils.getIndexFromValue(this.depthArray, Math.abs(depth) * -1);
+            depthLabel = [this.depthArray[depthIndex].toFixed(1)];
+        } else if (depth === 'all') {
+            depthIndex = 'all';
+            depthSize = this.depthArray.length;
+            depthLabel = this.depthArray.map(d => d.toFixed(1));
+        }
+
+        if (variable === 'velocity') {
+            let resultVx = this.getValues(colIndex, rowIndex, variables.HORIZONTAL_VELOCITY, startTimeIndex, endTimeIndex, timeSize, depthIndex, depthSize);
+            let resultVy = this.getValues(colIndex, rowIndex, variables.VERTICAL_VELOCITY, startTimeIndex, endTimeIndex, timeSize, depthIndex, depthSize);
+            table = utils.formatTable(depthSize, timeSize, resultVx, resultVy);
+        } else {
+            let result = this.getValues(colIndex, rowIndex, variable, startTimeIndex, endTimeIndex, timeSize, depthIndex, depthSize);
+            table = utils.formatTable(depthSize, timeSize, result);
+        }
+
+        let timeLabel = dateUtils.getTimeLabel(this.timeArray, startTimeIndex, endTimeIndex);
+
+        return utils.addLabel(table, timeLabel, depthLabel);
+    }
+
+    getValues (colIndex, rowIndex, variable, startTimeIndex, endTimeIndex, timeSize, depthIndex, depthSize) {
         let message = '';
         let result = [];
 
-        if ((depth || depth === 0) && depth !== 'all') {
-            let depthIndex = utils.getIndexFromValue(this.depthArray, Math.abs(depth) * -1);
-            depthLabel = [this.depthArray[depthIndex].toFixed(1)];
+        if ((depthIndex || depthIndex === 0) && depthIndex !== 'all') {
             message = `Retrieve ${variable} data from file ${this.path} at position ` +
                 `(${startTimeIndex}-${endTimeIndex}, ${depthIndex}, ${rowIndex}, ${colIndex}) (initial index = 0)`;
             result = this.reader.getDataVariableFiltered(variable, startTimeIndex, timeSize, depthIndex, depthSize, rowIndex, 1, colIndex, 1);
-        } else if (depth === 'all') {
-            depthSize = this.depthArray.length;
-            depthLabel = this.depthArray.map(d => d.toFixed(1));
+        } else if (depthIndex === 'all') {
             message = `Retrieve ${variable} data from file ${this.path} at position ` +
                 `(${startTimeIndex}-${endTimeIndex}, 0-${depthSize}, ${rowIndex}, ${colIndex}) (initial index = 0)`;
             result = this.reader.getDataVariableFiltered(variable, startTimeIndex, timeSize, 0, depthSize, rowIndex, 1, colIndex, 1);
@@ -94,10 +117,7 @@ class MeteolakesFile {
 
         logger.info(message);
 
-        let table = utils.formatTable(result, depthSize, timeSize);
-        let timeLabel = utils.getTimeLabel(this.timeArray, startTimeIndex, endTimeIndex);
-
-        return utils.addLabel(table, timeLabel, depthLabel);
+        return result;
     }
 }
 

@@ -20,12 +20,12 @@ function getValue (x, y, lake, variable, startTime, endTime, depth) {
 
     const file = new MeteolakesFile(utils.getFilePath(lake, time.start));
 
-    return file.getValue(coordinates.x, coordinates.y, properties.variable, time.start, time.end, properties.depth);
+    return file.getTable(coordinates.x, coordinates.y, properties.variable, time.start, time.end, properties.depth);
 }
 
 function checkProperties (variable, time, depth) {
     variable = variables[variable.toUpperCase()];
-    if (!variable) { utils.meteolakesError(true, 'invalid variable argument'); }
+    utils.meteolakesError(!variable, 'invalid variable argument');
 
     if (time) {
         time = parseFloat(time);
@@ -42,7 +42,7 @@ function checkProperties (variable, time, depth) {
     }
 
     if (variable === variables.TEMPERATURE || variable === variables.HORIZONTAL_VELOCITY ||
-        variable === variables.VERTICAL_VELOCITY) {
+        variable === variables.VERTICAL_VELOCITY || variable === variables.VELOCITY) {
         utils.meteolakesError(!depth, `variable ${variable} requires depth value`);
     }
 

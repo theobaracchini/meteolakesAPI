@@ -46,6 +46,26 @@ function findSunday (date) {
     return new Date(date.getTime() + diff * MILISECONDS_IN_DAY);
 }
 
+function getTimeLabel (timeArray, startIndex, endIndex) {
+    return ['depth\\time',
+        ...timeArray.slice(startIndex, endIndex + 1)
+            .map(d => {
+                let date = new Date(getJsTimestamp(d));
+                let day = formatDigit(date.getUTCDate());
+                let month = formatDigit(date.getUTCMonth() + 1);
+                let year = date.getUTCFullYear();
+                let hours = formatDigit(date.getUTCHours());
+                let minutes = formatDigit(date.getUTCMinutes());
+
+                return `${day}/${month}/${year} ${hours}:${minutes}`;
+            })];
+}
+
+function formatDigit (value) {
+    return value < 10 ? '0' + value : value;
+}
+
 module.exports.transformDate = transformDate;
 module.exports.getJsTimestamp = getJsTimestamp;
 module.exports.getDateDetails = getDateDetails;
+module.exports.getTimeLabel = getTimeLabel;

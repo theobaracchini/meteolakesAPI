@@ -30,16 +30,24 @@ describe('meteolakesFile module', () => {
         expect(result[24][180]).toBe('1.1015e+0');
     });
 
-    test('should retrieve data of a given variable, depth and position on a specified time interval', () => {
-        let result = file.getValue(532830, 144660, 'R1', 1539561600000, 1539594000000, 150);
+    test('should retrieve data of a given variable, depth and position on a specified time interval with proper format', () => {
+        let result = file.getTable(532830, 144660, 'R1', 1539561600000, 1539594000000, 150);
         let expected = [['depth\\time', '15/10/2018 00:00', '15/10/2018 03:00', '15/10/2018 06:00', '15/10/2018 09:00'],
             ['-150.4', '5.4538e+0', '5.4525e+0', '5.4333e+0', '5.4398e+0']];
 
         expect(result).toEqual(expected);
     });
 
-    test('should retrieve data of a given variable and position on a specified time interval over all depths', () => {
-        let result = file.getValue(532830, 144660, 'R1', 1539572400000, 1539583200000, 'all');
+    // test('should retrieve velocity data of a given depth and position on a specified time interval with proper format', () => {
+    //     let result = file.getTable(532830, 144660, 'velocity', 1539561600000, 1539594000000, 150);
+    //     let expected = [['depth\\time', '15/10/2018 00:00', '15/10/2018 03:00', '15/10/2018 06:00', '15/10/2018 09:00'],
+    //         ['-150.4', '(???, ???)', '(???, ???)', '(???, ???)', '(???, ???)']];
+
+    //     expect(result).toEqual(expected);
+    // });
+
+    test('should retrieve data of a given variable and position on a specified time interval over all depths with proper format', () => {
+        let result = file.getTable(532830, 144660, 'R1', 1539572400000, 1539583200000, 'all');
         let expectedLabelLine = ['depth\\time', '15/10/2018 03:00', '15/10/2018 06:00'];
         let expectedFirstLine = ['-307.0', '5.1550e+0', '5.1550e+0'];
         let expectedLine12 = ['-150.4', '5.4525e+0', '5.4333e+0'];
@@ -53,8 +61,8 @@ describe('meteolakesFile module', () => {
         expect(result[59]).toEqual(expectedLastLine);
     });
 
-    test('should retrieve a given value of a given variable and position on a specified time interval', () => {
-        let result = file.getValue(549315, 147210, 'S1', 1539561600000, 1539583200000);
+    test('should retrieve a given value of a given variable and position on a specified time interval with proper format', () => {
+        let result = file.getTable(549315, 147210, 'S1', 1539561600000, 1539583200000);
         let expected = [['depth\\time', '15/10/2018 00:00', '15/10/2018 03:00', '15/10/2018 06:00'],
             ['/', '1.1002e+0', '1.0994e+0', '1.1008e+0']];
 

@@ -32,7 +32,7 @@ this path allows the user to retrieve a CSV file containing an array of values a
 | Variable Name | description                                   | possible values                                                     |
 | ------------- | --------------------------------------------- | ------------------------------------------------------------------- |
 | :lake         | name of the lake                              | geneva/ greifen/ biel                                               |
-| :variable     | name of the variable in letters               | temperature / water_level / horizontal_velocity / vertical_velocity |
+| :variable     | name of the variable in letters               | temperature / water_level / velocity                                |
 | :time         | javascript timestamp                          | e.g.: 1539583200000                                                 |
 | :depth        | depth in meters                               | e.g.: 200                                                           |
 | :x            | swiss latitude coordinate                     | e.g.: 532830                                                        |

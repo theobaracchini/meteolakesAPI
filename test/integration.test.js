@@ -74,6 +74,21 @@ describe('MeteolakesAPI', () => {
             });
     });
 
+    test('should GET /api/coordinates/:x/:y/:lake/VELOCITY/:startTime/:endTime/:depth', (done) => {
+        let expected = [['depth\\time', '27/07/2018 09:00', '27/07/2018 12:00', '27/07/2018 15:00', '27/07/2018 18:00'],
+            ['-204.7', '(-3.7987e-3, -1.7264e-3)', '(-8.9700e-3, 4.8754e-3)', '(-8.2238e-3, -1.2094e-3)', '(-7.3394e-3, -4.3970e-3)'], ['']];
+        request(app)
+            .get('/api/coordinates/537575/149020/geneva/velocity/1532682000000/1532714400000/200')
+            .then(response => {
+                expect(response.statusCode).toBe(200);
+                expect(response.header['content-type']).toBe('text/csv; charset=utf-8');
+
+                let result = csvParser.parse(response.text).data;
+                expect(result).toEqual(expected);
+                done();
+            });
+    });
+
     test('should not work with an invalid variable name', (done) => {
         request(app)
             .get('/api/layer/geneva/wrong_variable/1532325600000')
