@@ -8,7 +8,7 @@ const date = require('date');
 function getLayer (lake, variable, time, depth) {
     let properties = checkProperties(variable, time, depth);
 
-    const file = new MeteolakesFile(utils.getFilePath(lake, properties.time));
+    const file = new MeteolakesFile(utils.getFilePathFromTime(lake, properties.time));
 
     return file.getLayer(properties.variable, properties.time, properties.depth);
 }
@@ -18,26 +18,29 @@ function getTableFromCoordinates (x, y, lake, variable, startTime, endTime, dept
     let time = checkTime(startTime, endTime);
     let coordinates = checkCoordinates(x, y);
 
-    const file = new MeteolakesFile(utils.getFilePath(lake, time.start));
+    const file = new MeteolakesFile(utils.getFilePathFromTime(lake, time.start));
 
     return file.getTable(coordinates.x, coordinates.y, properties.variable, time.start, time.end, properties.depth);
 }
 
-function checkProperties (variable, time, depth) {
+function getWeekData (week, year, lake, variable, depth) {
+    let properties = checkProperties(variable, null, depth, week, year);
+
+    const file = new MeteolakesFile(utils.getFilePath(lake, year, week));
+
+    return file.getWeekData(properties.variable, properties.depth);
+}
+
+function checkProperties (variable, time, depth, week, year) {
     variable = variables[variable.toUpperCase()];
     utils.meteolakesError(!variable, 'invalid variable argument');
 
-    if (time) {
-        time = parseFloat(time);
-        utils.meteolakesError(isNaN(time), 'invalid time argument');
-    }
+    utils.verifyNumber(time, 'time');
+    utils.verifyNumber(depth, 'depth');
+    utils.verifyNumber(week, 'week number');
+    utils.verifyNumber(year, 'year');
 
-    if (depth) {
-        depth = parseFloat(depth);
-        utils.meteolakesError(isNaN(depth), 'invalid depth argument');
-    }
-
-    if (!time && !depth) {
+    if (!time && !depth && !year && !week) {
         depth = 'all';
     }
 
@@ -46,7 +49,7 @@ function checkProperties (variable, time, depth) {
         utils.meteolakesError(!depth, `variable ${variable} requires depth value`);
     }
 
-    return { variable, time, depth };
+    return { variable, time, depth, week, year };
 }
 
 function checkTime (start, end) {
@@ -76,3 +79,4 @@ function checkCoordinates (x, y) {
 
 module.exports.getLayer = getLayer;
 module.exports.getTableFromCoordinates = getTableFromCoordinates;
+module.exports.getWeekData = getWeekData;

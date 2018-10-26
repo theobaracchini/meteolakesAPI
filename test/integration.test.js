@@ -3,6 +3,7 @@
 const app = require('app');
 const request = require('supertest');
 const csvParser = require('papaparse');
+const config = require('config/config')();
 // const logger = require('logger').logger;
 
 describe('MeteolakesAPI', () => {
@@ -56,7 +57,7 @@ describe('MeteolakesAPI', () => {
             });
     });
 
-    test('should GET /api/coordinates/:x/:y/:lake/:variable/:startTime/:endTime/', (done) => {
+    test('should GET /api/coordinates/:x/:y/:lake/:variable/:startTime/:endTime', (done) => {
         request(app)
             .get('/api/coordinates/516040/140140/geneva/temperature/1532509200000/1532682000000')
             .then(response => {
@@ -89,6 +90,63 @@ describe('MeteolakesAPI', () => {
             });
     });
 
+    test('should GET /api/week/:weekNumber/:year/:lake/:variable/:depth', (done) => {
+        request(app)
+            .get('/api/week/30/2018/geneva/temperature/0.5')
+            .then(response => {
+                expect(response.statusCode).toBe(200);
+                expect(response.header['content-type']).toBe('text/csv; charset=utf-8');
+
+                let result = csvParser.parse(response.text).data;
+                expect(result.length).toBe(182 + 1);
+                expect(result[0].length).toBe(36 * (56 + 3));
+                expect(result[1][1]).toEqual('0.0000e+0');
+                expect(result[0][17]).toEqual('5.0150e+5');
+                expect(result[100][36 * 2 + 10]).toEqual('-5.6459e-1');
+                expect(result[129][36 * 3 + 20]).toEqual('2.2329e+1');
+                expect(result[129][36 * 58 + 20]).toEqual('2.3055e+1');
+                done();
+            });
+    });
+
+    test('should GET /api/week/:weekNumber/:year/:lake/:variable', (done) => {
+        request(app)
+            .get('/api/week/30/2018/geneva/water_level')
+            .then(response => {
+                expect(response.statusCode).toBe(200);
+                expect(response.header['content-type']).toBe('text/csv; charset=utf-8');
+
+                let result = csvParser.parse(response.text).data;
+                expect(result.length).toBe(182 + 1);
+                expect(result[0].length).toBe(36 * (56 + 3));
+                expect(result[1][1]).toEqual('0.0000e+0');
+                expect(result[0][17]).toEqual('5.0150e+5');
+                expect(result[100][36 * 2 + 10]).toEqual('0.0000e+0');
+                expect(result[129][36 * 3 + 20]).toEqual('7.3553e-1');
+                expect(result[129][36 * 58 + 20]).toEqual('7.2580e-1');
+                done();
+            });
+    });
+
+    test('should GET /api/week/:weekNumber/:year/:lake/VELOCITY/:depth', (done) => {
+        request(app)
+            .get('/api/week/30/2018/geneva/velocity/0.5')
+            .then(response => {
+                expect(response.statusCode).toBe(200);
+                expect(response.header['content-type']).toBe('text/csv; charset=utf-8');
+
+                let result = csvParser.parse(response.text).data;
+                expect(result.length).toBe(182 + 1);
+                expect(result[0].length).toBe(36 * (56 * 2 + 3));
+                expect(result[1][1]).toEqual('0.0000e+0');
+                expect(result[0][17]).toEqual('5.0150e+5');
+                expect(result[100][36 * 2 + 10]).toEqual('-5.6459e-1');
+                expect(result[129][36 * (38 * 2 + 3) + 20]).toEqual('-7.2164e-2');
+                expect(result[129][36 * (38 * 2 + 4) + 20]).toEqual('1.6933e-1');
+                done();
+            });
+    });
+
     test('should not work with an invalid variable name', (done) => {
         request(app)
             .get('/api/layer/geneva/wrong_variable/1532325600000')
@@ -101,7 +159,8 @@ describe('MeteolakesAPI', () => {
         request(app)
             .get('/api/layer/lake/water_level/1532325600000')
             .expect(400)
-            .expect('Error occured during Meteolakes API call: ENOENT: no such file or directory, open \'D:\\Dan\\workspace\\data_lake\\2018\\netcdf\\lake_2018_week30.nc\'')
+            .expect(`Error occured during Meteolakes API call: ENOENT: no such file or directory, ` +
+                `open '${config.data_path}\\data_lake\\2018\\netcdf\\lake_2018_week30.nc'`)
             .then(() => done());
     });
 
@@ -117,7 +176,8 @@ describe('MeteolakesAPI', () => {
         request(app)
             .get('/api/layer/geneva/water_level/123456789')
             .expect(400)
-            .expect('Error occured during Meteolakes API call: ENOENT: no such file or directory, open \'D:\\Dan\\workspace\\data\\1970\\netcdf\\geneva_1970_week1.nc\'')
+            .expect(`Error occured during Meteolakes API call: ENOENT: no such file or directory, open ` +
+                `'${config.data_path}\\data\\1970\\netcdf\\geneva_1970_week1.nc'`)
             .then(() => done());
     });
 
@@ -182,6 +242,31 @@ describe('MeteolakesAPI', () => {
             .get('/api/coordinates/516040/140140/geneva/water_level/1532682000000/1532995200000')
             .expect(400)
             .expect('Error occured during Meteolakes API call: start time and end time do not belong to the same week')
+            .then(() => done());
+    });
+
+    test('should not work with invalid week number', (done) => {
+        request(app)
+            .get('/api/week/week/2018/geneva/temperature/0.5')
+            .expect(400)
+            .expect('Error occured during Meteolakes API call: invalid week number argument')
+            .then(() => done());
+    });
+
+    test('should not work with invalid year value', (done) => {
+        request(app)
+            .get('/api/week/30/year/geneva/temperature/0.5')
+            .expect(400)
+            .expect('Error occured during Meteolakes API call: invalid year argument')
+            .then(() => done());
+    });
+
+    test('should not work with week number or year that has no data', (done) => {
+        request(app)
+            .get('/api/week/29/2017/geneva/temperature/0.5')
+            .expect(400)
+            .expect(`Error occured during Meteolakes API call: ENOENT: no such file or directory, open ` +
+                `'${config.data_path}\\data\\2017\\netcdf\\geneva_2017_week29.nc'`)
             .then(() => done());
     });
 });

@@ -38,6 +38,18 @@ app.get('/api/coordinates/:x/:y/:lake/:variable/:startTime/:endTime/:depth', (re
     res.csv(controller.getTableFromCoordinates(req.params.x, req.params.y, req.params.lake, req.params.variable, req.params.startTime, req.params.endTime, req.params.depth));
 });
 
+app.get('/api/week/:weekNumber/:year/:lake/:variable/:depth', (req, res) => {
+    res.setHeader('Content-disposition', `attachment; filename=Week_${req.params.weekNumber}_${req.params.lake}_${req.params.variable}_${req.params.depth}m.csv`);
+    res.set('Content-Type', 'text/csv');
+    res.csv(controller.getWeekData(req.params.weekNumber, req.params.year, req.params.lake, req.params.variable, req.params.depth));
+});
+
+app.get('/api/week/:weekNumber/:year/:lake/:variable', (req, res) => {
+    res.setHeader('Content-disposition', `attachment; filename=Week_${req.params.weekNumber}_${req.params.lake}_${req.params.variable}.csv`);
+    res.set('Content-Type', 'text/csv');
+    res.csv(controller.getWeekData(req.params.weekNumber, req.params.year, req.params.lake, req.params.variable));
+});
+
 app.use(function (err, req, res, next) {
     logger.error(err.stack);
     let statusCode = 500;

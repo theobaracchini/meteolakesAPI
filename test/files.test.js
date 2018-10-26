@@ -68,4 +68,33 @@ describe('meteolakesFile module', () => {
 
         expect(result).toEqual(expected);
     });
+
+    test('should retrieve the week data of a given variable at a specific depth', () => {
+        let result = file.getWeekData('R1', 0.5);
+
+        expect(result.length).toBe(182);
+        expect(result[0].length).toBe(36 * (4 + 3));
+        expect(result[1][1]).toEqual('0.0000e+0');
+        expect(result[0][17]).toEqual('5.0150e+5');
+        expect(result[100][36 * 2 + 10]).toEqual('-5.6459e-1');
+        expect(result[129][36 * 3 + 20]).toEqual('1.6233e+1');
+        expect(result[129][36 * 6 + 20]).toEqual('1.6145e+1');
+    });
+
+    // test('should retrieve the week data of velocity at a specific depth', () => {
+    //     let result = file.getWeekData('velocity', 0.5);
+    //     //TODO
+    // });
+
+    test('should retrieve the week data of a given variable', () => {
+        let result = file.getWeekData('S1');
+
+        expect(result.length).toBe(182);
+        expect(result[0].length).toBe(36 * (4 + 3));
+        expect(result[1][1]).toEqual('0.0000e+0');
+        expect(result[0][17]).toEqual('5.0150e+5');
+        expect(result[100][36 * 2 + 10]).toEqual('0.0000e+0');
+        expect(result[129][36 * 3 + 20]).toEqual('1.0915e+0');
+        expect(result[129][36 * 6 + 20]).toEqual('1.0930e+0');
+    });
 });

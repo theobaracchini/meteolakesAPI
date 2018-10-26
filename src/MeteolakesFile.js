@@ -25,17 +25,17 @@ class MeteolakesFile {
         this.variables = this.reader.variables;
 
         this.depthSize = this.dimensions.find(dim => dim.name === dimensions.Z).size;
-        this.colSize = this.dimensions.find(dim => dim.name === dimensions.Y).size;
-        this.rowSize = this.dimensions.find(dim => dim.name === dimensions.X).size;
+        this.ySize = this.dimensions.find(dim => dim.name === dimensions.Y).size;
+        this.xSize = this.dimensions.find(dim => dim.name === dimensions.X).size;
 
         this.timeArray = this.reader.getDataVariable(variables.TIME);
         this.depthArray = this.reader.getDataVariable(variables.DEPTH);
-        this.longitudeArray = utils.formatTable(this.colSize, this.rowSize, this.reader.getDataVariable(variables.LONGITUDE));
-        this.latitudeArray = utils.formatTable(this.colSize, this.rowSize, this.reader.getDataVariable(variables.LATITUDE));
+        this.longitudeArray = this.reader.getDataVariable(variables.LONGITUDE);
+        this.latitudeArray = this.reader.getDataVariable(variables.LATITUDE);
     }
 
     getLayer (variable, time, depth) {
-        let size = this.colSize * this.rowSize;
+        let size = this.ySize * this.xSize;
 
         let timeIndex = utils.getIndexFromValue(this.timeArray, dateUtils.transformDate(time));
         let startIndex = 0;
@@ -45,24 +45,25 @@ class MeteolakesFile {
             let depthIndex = utils.getIndexFromValue(this.depthArray, Math.abs(depth) * -1);
             startIndex = timeIndex * this.depthSize * size + depthIndex * size;
             message = `Retrieve ${variable} data from file ${this.path} at time index ${timeIndex} and depth index ` +
-                `${depthIndex} (initial index = 0) on a 2D array of size ${this.rowSize}x${this.colSize}`;
+                `${depthIndex} (initial index = 0) on a 2D array of size ${this.xSize}x${this.ySize}`;
         } else {
             startIndex = timeIndex * size;
             message = `Retrieve ${variable} data from file ${this.path} at time index ${timeIndex} ` +
-                `(initial index = 0) on a 2D array of size ${this.rowSize}x${this.colSize}`;
+                `(initial index = 0) on a 2D array of size ${this.xSize}x${this.ySize}`;
         }
 
         let result = this.reader.getDataVariableSlice(variable, startIndex, size);
 
         logger.info(message);
 
-        return utils.formatTable(this.colSize, this.rowSize, result);
+        return utils.formatTable(this.ySize, this.xSize, result);
     }
 
     getTable (x, y, variable, startTime, endTime, depth) {
         let table = [];
 
-        let coordinates = utils.getCoordinatesIndex(this.latitudeArray, this.longitudeArray, x, y);
+        let coordinates = utils.getCoordinatesIndex(utils.formatTable(this.ySize, this.xSize, this.latitudeArray),
+            utils.formatTable(this.ySize, this.xSize, this.longitudeArray), x, y);
         let colIndex = coordinates.N;
         let rowIndex = coordinates.M;
 
@@ -116,6 +117,39 @@ class MeteolakesFile {
         }
 
         logger.info(message);
+
+        return result;
+    }
+
+    getWeekData (variable, depth) {
+        let result = [];
+        let size = this.xSize * this.ySize;
+        let depthIndex = 0;
+        let depthSize = 1;
+
+        if (depth || depth === 0) {
+            depthIndex = utils.getIndexFromValue(this.depthArray, Math.abs(depth) * -1);
+            depthSize = this.depthSize;
+            depth = this.depthArray[depthIndex];
+        }
+
+        utils.addToWeekData(result, this.xSize, this.ySize, this.latitudeArray);
+        utils.addToWeekData(result, this.xSize, this.ySize, this.longitudeArray);
+        utils.addToWeekData(result, this.xSize, this.ySize,
+            utils.createDepthArray(depth, size));
+
+        for (let timeIndex = 0; timeIndex < this.timeArray.length; timeIndex++) {
+            let startIndex = timeIndex * depthSize * size + depthIndex * size;
+            if (variable === variables.VELOCITY) {
+                utils.addToWeekData(result, this.xSize, this.ySize,
+                    this.reader.getDataVariableSlice(variables.HORIZONTAL_VELOCITY, startIndex, size));
+                utils.addToWeekData(result, this.xSize, this.ySize,
+                    this.reader.getDataVariableSlice(variables.VERTICAL_VELOCITY, startIndex, size));
+            } else {
+                utils.addToWeekData(result, this.xSize, this.ySize,
+                    this.reader.getDataVariableSlice(variable, startIndex, size));
+            }
+        }
 
         return result;
     }

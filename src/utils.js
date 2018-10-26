@@ -30,6 +30,17 @@ function formatTable (colSize, rowSize, array1, array2) {
     return result;
 }
 
+function addToWeekData (data, colSize, rowSize, newArray) {
+    let initialRowPosition = data[0] ? data[0].length : 0;
+    for (let colPosition = 0; colPosition < colSize; colPosition++) {
+        for (let rowPosition = initialRowPosition; rowPosition < rowSize + initialRowPosition; rowPosition++) {
+            if (rowPosition === 0) { data.push([]); }
+            data[colPosition][rowPosition] =
+                formatValue(newArray[rowPosition - initialRowPosition + colPosition * rowSize]);
+        }
+    }
+}
+
 function formatValue (value) {
     if (value === -999) {
         return NaN;
@@ -89,12 +100,17 @@ function getCoordinatesIndex (xArray, yArray, x, y) {
     return { M: finalM, N: finalN };
 }
 
-function getFilePath (lake, time) {
-    let filePath = '';
+function getFilePathFromTime (lake, time) {
     const date = new Date(Number.parseFloat(time));
     const dateDetails = dateUtils.getDateDetails(date);
     let year = dateDetails.year;
     let week = dateDetails.week;
+
+    return getFilePath(lake, year, week);
+}
+
+function getFilePath (lake, year, week) {
+    let filePath = '';
     let filename = `${lake}_${year}_week${week}.nc`;
 
     if (lake === 'geneva') {
@@ -117,9 +133,30 @@ function addLabel (table, firstRow, firstCol) {
     return result;
 }
 
+function verifyNumber (value, type) {
+    if (value) {
+        value = parseFloat(value);
+        meteolakesError(isNaN(value), type ? `invalid ${type} argument` : 'invalid argument');
+    }
+
+    return value;
+}
+
+function createDepthArray (depth, size) {
+    let result = [];
+    for (let i = 0; i < size; i++) {
+        result[i] = isNaN(depth) ? 0 : depth;
+    }
+    return result;
+}
+
 module.exports.meteolakesError = meteolakesError;
 module.exports.formatTable = formatTable;
+module.exports.addToWeekData = addToWeekData;
 module.exports.getIndexFromValue = getIndexFromValue;
+module.exports.getFilePathFromTime = getFilePathFromTime;
 module.exports.getFilePath = getFilePath;
 module.exports.getCoordinatesIndex = getCoordinatesIndex;
 module.exports.addLabel = addLabel;
+module.exports.verifyNumber = verifyNumber;
+module.exports.createDepthArray = createDepthArray;
