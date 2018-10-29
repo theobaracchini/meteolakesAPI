@@ -125,11 +125,9 @@ class MeteolakesFile {
         let result = [];
         let size = this.xSize * this.ySize;
         let depthIndex = 0;
-        let depthSize = 1;
 
         if (depth || depth === 0) {
             depthIndex = utils.getIndexFromValue(this.depthArray, Math.abs(depth) * -1);
-            depthSize = this.depthSize;
             depth = this.depthArray[depthIndex];
         }
 
@@ -138,16 +136,21 @@ class MeteolakesFile {
         utils.addToWeekData(result, this.xSize, this.ySize,
             utils.createDepthArray(depth, size));
 
-        for (let timeIndex = 0; timeIndex < this.timeArray.length; timeIndex++) {
-            let startIndex = timeIndex * depthSize * size + depthIndex * size;
-            if (variable === variables.VELOCITY) {
-                utils.addToWeekData(result, this.xSize, this.ySize,
-                    this.reader.getDataVariableSlice(variables.HORIZONTAL_VELOCITY, startIndex, size));
-                utils.addToWeekData(result, this.xSize, this.ySize,
-                    this.reader.getDataVariableSlice(variables.VERTICAL_VELOCITY, startIndex, size));
-            } else {
-                utils.addToWeekData(result, this.xSize, this.ySize,
-                    this.reader.getDataVariableSlice(variable, startIndex, size));
+        if (variable === variables.VELOCITY) {
+            let dataX = this.reader.getDataVariableFiltered(variables.HORIZONTAL_VELOCITY, 0, this.timeArray.length, depthIndex, 1, 0, this.xSize, 0, this.ySize);
+            let dataY = this.reader.getDataVariableFiltered(variables.VERTICAL_VELOCITY, 0, this.timeArray.length, depthIndex, 1, 0, this.xSize, 0, this.ySize);
+
+            for (let timeIndex = 0; timeIndex < this.timeArray.length; timeIndex++) {
+                utils.addToWeekData(result, this.xSize, this.ySize, dataX.slice(timeIndex * size, (timeIndex + 1) * size));
+                utils.addToWeekData(result, this.xSize, this.ySize, dataY.slice(timeIndex * size, (timeIndex + 1) * size));
+            }
+        } else {
+            let data = (depth || depth === 0)
+                ? this.reader.getDataVariableFiltered(variable, 0, this.timeArray.length, depthIndex, 1, 0, this.xSize, 0, this.ySize)
+                : this.reader.getDataVariableFiltered(variable, 0, this.timeArray.length, 0, this.xSize, 0, this.ySize);
+
+            for (let timeIndex = 0; timeIndex < this.timeArray.length; timeIndex++) {
+                utils.addToWeekData(result, this.xSize, this.ySize, data.slice(timeIndex * size, (timeIndex + 1) * size));
             }
         }
 
