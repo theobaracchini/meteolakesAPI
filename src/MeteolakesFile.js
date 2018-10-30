@@ -133,18 +133,20 @@ class MeteolakesFile {
 
         utils.addToWeekData(result, this.xSize, this.ySize, this.latitudeArray);
         utils.addToWeekData(result, this.xSize, this.ySize, this.longitudeArray);
-        utils.addToWeekData(result, this.xSize, this.ySize,
-            utils.createDepthArray(depth, size));
 
         if (variable === variables.VELOCITY) {
             let dataX = this.reader.getDataVariableFiltered(variables.HORIZONTAL_VELOCITY, 0, this.timeArray.length, depthIndex, 1, 0, this.xSize, 0, this.ySize);
-            let dataY = this.reader.getDataVariableFiltered(variables.VERTICAL_VELOCITY, 0, this.timeArray.length, depthIndex, 1, 0, this.xSize, 0, this.ySize);
-
             for (let timeIndex = 0; timeIndex < this.timeArray.length; timeIndex++) {
                 utils.addToWeekData(result, this.xSize, this.ySize, dataX.slice(timeIndex * size, (timeIndex + 1) * size));
+            }
+
+            let dataY = this.reader.getDataVariableFiltered(variables.VERTICAL_VELOCITY, 0, this.timeArray.length, depthIndex, 1, 0, this.xSize, 0, this.ySize);
+            for (let timeIndex = 0; timeIndex < this.timeArray.length; timeIndex++) {
                 utils.addToWeekData(result, this.xSize, this.ySize, dataY.slice(timeIndex * size, (timeIndex + 1) * size));
             }
         } else {
+            utils.addToWeekData(result, this.xSize, this.ySize,
+                utils.createDepthArray(depth, size));
             let data = (depth || depth === 0)
                 ? this.reader.getDataVariableFiltered(variable, 0, this.timeArray.length, depthIndex, 1, 0, this.xSize, 0, this.ySize)
                 : this.reader.getDataVariableFiltered(variable, 0, this.timeArray.length, 0, this.xSize, 0, this.ySize);

@@ -137,12 +137,11 @@ describe('MeteolakesAPI', () => {
 
                 let result = csvParser.parse(response.text).data;
                 expect(result.length).toBe(182 + 1);
-                expect(result[0].length).toBe(36 * (56 * 2 + 3));
+                expect(result[0].length).toBe(36 * (56 * 2 + 2));
                 expect(result[1][1]).toEqual('0.0000e+0');
                 expect(result[0][17]).toEqual('5.0150e+5');
-                expect(result[100][36 * 2 + 10]).toEqual('-5.6459e-1');
-                expect(result[129][36 * (38 * 2 + 3) + 20]).toEqual('-7.2164e-2');
-                expect(result[129][36 * (38 * 2 + 4) + 20]).toEqual('1.6933e-1');
+                expect(result[129][36 * (2 + 38) + 20]).toEqual('-7.2164e-2');
+                expect(result[129][36 * (2 + 56 + 38) + 20]).toEqual('1.6933e-1');
                 done();
             });
     });
