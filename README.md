@@ -12,7 +12,7 @@ Run `$ npm install` and then you can start the application locally using `$ npm 
 * Then copy paste `dist` folder, `config` folder and `package.json` on your server
 * Run `$ npm install` from your server
 * Finally, run `$ npm run serve` to start server.
-* Note that you need to deploy the package `netcdfjs` in a sibling folder and have the data stored in a sibling folder called `data`.
+* Note that you need to deploy the package `netcdfjs` in a sibling folder. checkout branch filter-data
 
 ## API Documentation
 
@@ -51,21 +51,15 @@ For example, if you want data on November 1st 2018 at 03:00 be sure to pass the 
 1541041200000)
 
 ## Testing
-In order to be able to run the integration tests, you need a folder called data (sibling to the meteolakesAPI folder) with the following structure:
+In order to be able to run the integration tests, you need a folder called meteolkaesAPI_data (sibling to the meteolakesAPI folder) with the following structure:
 `
 meteolakesAPI_data
 |--data
-| |
 | |--2018
-|   |
 |   |--netcdf
-|     |
 |     |--geneva_2018_week30.nc
 |
 |--data_greifensee
-  |
   |--2018
-    |
     |--netcdf
-      |
       |--greifensee_2018_week44.nc`
