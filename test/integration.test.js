@@ -146,6 +146,23 @@ describe('MeteolakesAPI', () => {
             });
     });
 
+    test('should work with any lake', (done) => {
+        request(app)
+            .get('/api/layer/greifensee/water_level/1541127600000')
+            .then(response => {
+                expect(response.statusCode).toBe(200);
+                expect(response.header['content-type']).toBe('text/csv; charset=utf-8');
+
+                let result = csvParser.parse(response.text).data;
+                expect(result.length).toBe(109 + 1); // there is one empty line at the end of the file, thus the array.
+                expect(result[0].length).toBe(28);
+                expect(result[0][0]).toBe('0.0000e+0');
+                expect(result[100][11]).toBe('2.0358e-4');
+                expect(result[45][22]).toBe('-4.3926e-4');
+                done();
+            });
+    });
+
     test('should not work with an invalid variable name', (done) => {
         request(app)
             .get('/api/layer/geneva/wrong_variable/1532325600000')

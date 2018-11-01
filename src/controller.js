@@ -49,6 +49,10 @@ function checkProperties (variable, time, depth, week, year) {
         utils.meteolakesError(!depth, `variable ${variable} requires depth value`);
     }
 
+    if (variable === variables.WATER_LEVEL && depth) {
+        depth = null;
+    }
+
     return { variable, time, depth, week, year };
 }
 

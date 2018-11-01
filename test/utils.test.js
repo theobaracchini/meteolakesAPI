@@ -3,6 +3,7 @@
 const path = require('path');
 const utils = require('utils');
 const dateUtils = require('date');
+const config = require('config/config')();
 
 describe('utils module', () => {
     test('should throw an error if predicate is true', () => {
@@ -71,17 +72,15 @@ describe('utils module', () => {
     test('should find file path if it\'s geneva lake', () => {
         let lake = 'geneva';
         let time = 1532314800000;
-        let baseDir = path.dirname(path.dirname(__dirname));
-        let expected = path.join(baseDir, 'data', '2018', 'netcdf', 'geneva_2018_week30.nc');
+        let expected = path.join(config.data_path, 'data', '2018', 'netcdf', 'geneva_2018_week30.nc');
 
         expect(utils.getFilePathFromTime(lake, time)).toBe(expected);
     });
 
     test('should find file path if it\'s any other lake', () => {
-        let lake = 'greifen';
+        let lake = 'greifensee';
         let time = 1492293600000;
-        let baseDir = path.dirname(path.dirname(__dirname));
-        let expected = path.join(baseDir, 'data_greifen', '2017', 'netcdf', 'greifen_2017_week15.nc');
+        let expected = path.join(config.data_path, 'data_greifensee', '2017', 'netcdf', 'greifensee_2017_week15.nc');
 
         expect(utils.getFilePathFromTime(lake, time)).toBe(expected);
     });
