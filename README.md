@@ -41,8 +41,8 @@ this path allows the user to retrieve a CSV file containing all data relative to
 | :variable     | name of the variable in letters               | temperature / water_level / velocity                                |
 | :time         | javascript timestamp                          | e.g.: 1539583200000                                                 |
 | :depth        | depth in meters                               | e.g.: 200                                                           |
-| :x            | swiss latitude coordinate                     | e.g.: 532830                                                        |
-| :y            | swiss longitude coordinate                    | e.g.: 144660                                                        |
+| :x            | swiss longitude coordinate                     | e.g.: 532830                                                        |
+| :y            | swiss latitude coordinate                    | e.g.: 144660                                                        |
 | :startTime    | javascript timestamp where to start selection | e.g.: 1539583200000                                                 |
 | :endTime      | javascript timestamp where to end selection   | e.g.: 1539583200000                                                 |
 

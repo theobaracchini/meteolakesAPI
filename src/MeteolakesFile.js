@@ -62,8 +62,8 @@ class MeteolakesFile {
     getTable (x, y, variable, startTime, endTime, depth) {
         let table = [];
 
-        let coordinates = utils.getCoordinatesIndex(utils.formatTable(this.ySize, this.xSize, this.latitudeArray),
-            utils.formatTable(this.ySize, this.xSize, this.longitudeArray), x, y);
+        let coordinates = utils.getCoordinatesIndex(utils.formatTable(this.ySize, this.xSize, this.longitudeArray),
+            utils.formatTable(this.ySize, this.xSize, this.latitudeArray), x, y);
         let colIndex = coordinates.N;
         let rowIndex = coordinates.M;
 
@@ -131,8 +131,8 @@ class MeteolakesFile {
             depth = this.depthArray[depthIndex];
         }
 
-        utils.addToWeekData(result, this.xSize, this.ySize, this.latitudeArray);
         utils.addToWeekData(result, this.xSize, this.ySize, this.longitudeArray);
+        utils.addToWeekData(result, this.xSize, this.ySize, this.latitudeArray);
 
         if (variable === variables.VELOCITY) {
             let dataX = this.reader.getDataVariableFiltered(variables.HORIZONTAL_VELOCITY, 0, this.timeArray.length, depthIndex, 1, 0, this.xSize, 0, this.ySize);
