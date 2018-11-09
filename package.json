@@ -1,6 +1,6 @@
 {
   "name": "api",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "meteolakes back end service",
   "main": "src/server.js",
   "scripts": {
@@ -12,7 +12,7 @@
     "test": "npm run test-jest && npm run eslint",
     "test-jest": "jest --silent"
   },
-  "author": "Daniel Forte Marques",
+  "author": "Daniel Forte Marques & Theo Baracchini",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
