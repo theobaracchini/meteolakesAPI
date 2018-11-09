@@ -13,14 +13,55 @@ function getLayer (lake, variable, time, depth) {
     return file.getLayer(properties.variable, properties.time, properties.depth);
 }
 
+
 function getTableFromCoordinates (x, y, lake, variable, startTime, endTime, depth) {
     let properties = checkProperties(variable, null, depth);
     let time = checkTime(startTime, endTime);
     let coordinates = checkCoordinates(x, y);
 
-    const file = new MeteolakesFile(utils.getFilePathFromTime(lake, time.start));
+    const startDateInfo = date.getDateDetails(new Date(parseFloat(startTime)));
+    const endDateInfo = date.getDateDetails(new Date(parseFloat(endTime)));
+    const weekIni = startDateInfo.week;
+    const weekEnd = endDateInfo.week;
+	//const weekEnd = weekIni+1;
+    var weekNbr = weekIni;
+	
+	var fileTable = [];	
+    if (weekEnd < weekIni) {
 
-    return file.getTable(coordinates.x, coordinates.y, properties.variable, time.start, time.end, properties.depth);
+      let endTime = utils.getDateFromIsoweek(weekIni,startDateInfo.year,8);
+
+      const file = new MeteolakesFile(utils.getFilePathFromTime(lake, time.start));
+      fileTable = file.getTable(coordinates.x, coordinates.y, properties.variable, time.start, endTime, properties.depth);
+      console.log('Warning: interface between years detected. Please make different requests for different years');
+
+    } else {
+
+    while (weekNbr <= weekEnd){
+
+        let timeWeekIni = utils.getDateFromIsoweek(weekNbr,startDateInfo.year,1);
+        let timeWeekEnd = utils.getDateFromIsoweek(weekNbr,startDateInfo.year,8);
+			 
+        let timeStartWeek = Math.max(startTime,timeWeekIni);
+        let timeEndWeek = Math.min(endTime,timeWeekEnd);
+
+        var file = new MeteolakesFile(utils.getFilePathFromTime(lake, timeStartWeek));
+        var fileTableSub = file.getTable(coordinates.x, coordinates.y, properties.variable, timeStartWeek, timeEndWeek, properties.depth);
+        
+        if (fileTable.length > 0){
+		  for (let i = 0; i < fileTable.length; i++){
+			delete fileTableSub[i][0]
+			fileTable[i].push(fileTableSub[i])
+		  }
+        } else{
+			fileTable = fileTable.concat(fileTableSub);
+		}
+        weekNbr++;
+      }
+	  
+	}
+
+    return fileTable;
 }
 
 function getWeekData (week, year, lake, variable, depth) {
@@ -62,11 +103,12 @@ function checkTime (start, end) {
     end = parseFloat(end);
     utils.meteolakesError(isNaN(end), 'invalid end time argument');
 
+    // THEO: the following is not needed with the new multi-week support
     // check if the time belong to the same week
-    let startDateInfo = date.getDateDetails(new Date(start));
-    let endDateInfo = date.getDateDetails(new Date(end));
-    let checkError = startDateInfo.week !== endDateInfo.week || startDateInfo.year !== endDateInfo.year;
-    utils.meteolakesError(checkError, 'start time and end time do not belong to the same week');
+    // let startDateInfo = date.getDateDetails(new Date(start));
+    // let endDateInfo = date.getDateDetails(new Date(end));
+    // let checkError = startDateInfo.week !== endDateInfo.week || startDateInfo.year !== endDateInfo.year;
+    // utils.meteolakesError(checkError, 'start time and end time do not belong to the same week');
 
     return { start, end };
 }

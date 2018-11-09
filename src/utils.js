@@ -150,6 +150,21 @@ function createDepthArray (depth, size) {
     return result;
 }
 
+function getDateFromIsoweek (isoweek, year, day) {
+  //if (day > 7){
+  //    meteolakesError('Argument day has to be between 1 and 7 (included).');
+  //}
+    var simple = new Date(year, 0, 1 + (isoweek - 1) * 7, 3);
+    var dow = simple.getDay();
+    var ISOweekStart = simple;
+    if (dow <= 4) {
+        ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
+    } else {
+        ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
+    }
+    return ISOweekStart.setDate(ISOweekStart.getDate() + (day-1));
+}
+
 module.exports.meteolakesError = meteolakesError;
 module.exports.formatTable = formatTable;
 module.exports.addToWeekData = addToWeekData;
@@ -160,3 +175,4 @@ module.exports.getCoordinatesIndex = getCoordinatesIndex;
 module.exports.addLabel = addLabel;
 module.exports.verifyNumber = verifyNumber;
 module.exports.createDepthArray = createDepthArray;
+module.exports.getDateFromIsoweek = getDateFromIsoweek;
