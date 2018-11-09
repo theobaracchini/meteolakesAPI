@@ -10,11 +10,25 @@ const logger = log.logger;
 
 const app = express();
 
+var cors = require('cors');
+app.use(cors());
+
+var whitelist = ['http://meteolakes.ch', 'http://meteolakes.com']
+var corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+}
+
 app.use(morgan);
 
 app.use(helmet());
 
-app.get('/api/layer/:lake/:variable/:time/:depth', (req, res) => {
+app.get('/api/layer/:lake/:variable/:time/:depth', cors(corsOptions), (req, res) => {
     res.setHeader('Content-disposition', `attachment; filename=Layer_${req.params.lake}_${req.params.variable}_${req.params.depth}_${req.params.time}.csv`);
     res.set('Content-Type', 'text/csv');
     res.csv(controller.getLayer(req.params.lake, req.params.variable, req.params.time, req.params.depth));
@@ -38,13 +52,13 @@ app.get('/api/coordinates/:x/:y/:lake/:variable/:startTime/:endTime/:depth', (re
     res.csv(controller.getTableFromCoordinates(req.params.x, req.params.y, req.params.lake, req.params.variable, req.params.startTime, req.params.endTime, req.params.depth));
 });
 
-app.get('/api/week/:weekNumber/:year/:lake/:variable/:depth', (req, res) => {
+app.get('/api/week/:weekNumber/:year/:lake/:variable/:depth', cors(corsOptions), (req, res) => {
     res.setHeader('Content-disposition', `attachment; filename=Week_${req.params.weekNumber}_${req.params.lake}_${req.params.variable}_${req.params.depth}m.csv`);
     res.set('Content-Type', 'text/csv');
     res.csv(controller.getWeekData(req.params.weekNumber, req.params.year, req.params.lake, req.params.variable, req.params.depth));
 });
 
-app.get('/api/week/:weekNumber/:year/:lake/:variable', (req, res) => {
+app.get('/api/week/:weekNumber/:year/:lake/:variable', cors(corsOptions), (req, res) => {
     res.setHeader('Content-disposition', `attachment; filename=Week_${req.params.weekNumber}_${req.params.lake}_${req.params.variable}.csv`);
     res.set('Content-Type', 'text/csv');
     res.csv(controller.getWeekData(req.params.weekNumber, req.params.year, req.params.lake, req.params.variable));
