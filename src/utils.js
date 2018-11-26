@@ -85,7 +85,7 @@ function getCoordinatesIndex (xArray, yArray, x, y) {
 
     for (let m = 0; m < maxM; m++) {
         for (let n = 0; n < maxN; n++) {
-            let distance = Math.pow(x - xArray[n][m], 2) + Math.pow(y - yArray[n][m], 2);
+            let distance = Math.pow(Math.pow(x - xArray[n][m], 2) + Math.pow(y - yArray[n][m], 2), 0.5);
 
             if (distance < minDistance) {
                 minDistance = distance;
@@ -94,6 +94,8 @@ function getCoordinatesIndex (xArray, yArray, x, y) {
             }
         }
     }
+	
+	//console.log(minDistance)
 
     meteolakesError(minDistance > MAX_DISTANCE, 'specified coordinates outside the lake');
 
