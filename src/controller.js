@@ -47,11 +47,13 @@ function getTableFromCoordinates (x, y, lake, variable, startTime, endTime, dept
 
         var file = new MeteolakesFile(utils.getFilePathFromTime(lake, timeStartWeek));
         var fileTableSub = file.getTable(coordinates.x, coordinates.y, properties.variable, timeStartWeek, timeEndWeek, properties.depth);
-        
+		       
         if (fileTable.length > 0){
 		  for (let i = 0; i < fileTable.length; i++){
 			delete fileTableSub[i][0]
-			fileTable[i].push(fileTableSub[i])
+			let filteredArray = fileTableSub[i].filter(function () { return true });
+			//fileTable[i].push(filteredArray)
+			fileTable[i] = fileTable[i].concat(filteredArray);
 		  }
         } else{
 			fileTable = fileTable.concat(fileTableSub);
@@ -60,6 +62,7 @@ function getTableFromCoordinates (x, y, lake, variable, startTime, endTime, dept
       }
 	  
 	}
+	//console.log(fileTable)
 
     return fileTable;
 }
