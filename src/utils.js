@@ -45,7 +45,7 @@ function formatValue (value) {
     if (value === -999) {
         return NaN;
     } else {
-        return value.toExponential(4);
+        return value.toFixed(3);
     }
 }
 
