@@ -129,7 +129,11 @@ function addLabel (table, firstRow, firstCol) {
     result.push(firstRow);
 
     for (let i = 0; i < firstCol.length; i++) {
-        result.push([firstCol[i], ...table[i]]);
+        if(table.length > i) {
+            result.push([firstCol[i], ...table[i]]);
+        } else {
+            result.push([firstCol[i]]);
+        }
     }
 
     return result;
