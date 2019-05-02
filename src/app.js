@@ -5,7 +5,7 @@ const express = require('express');
 const helmet = require('helmet');
 const controller = require('controller');
 const log = require('logger');
-const morgan = log.morgan;
+const request = log.request;
 const logger = log.logger;
 
 const app = express();
@@ -24,7 +24,7 @@ var corsOptions = {
   }
 }
 
-app.use(morgan);
+app.use(request);
 
 app.use(helmet());
 

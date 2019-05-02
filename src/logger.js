@@ -6,46 +6,57 @@ const morgan = require('morgan');
 const fs = require('fs');
 const path = require('path');
 const split = require('split');
+const config = require('config/config')();
 require('winston-daily-rotate-file');
 
 // ensure log directory exists
-const logDirectory = path.join(__dirname, '..', 'logs');
+const logDirectory = config.log_path;
 fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory);
 
 const myFormat = format.printf(info => {
     return `${info.timestamp} [${info.label}] ${info.level}: ${info.message}`;
 });
 
-const transport = new (winston.transports.DailyRotateFile)({
-    filename: 'application-%DATE%.log',
-    dirname: logDirectory,
-    datePattern: 'YYYY-MM-DD-HH',
-    zippedArchive: true,
-    maxSize: '20m',
-    maxFiles: '14d'
-});
+function createLogger(logName) {
+    let directory = path.join(logDirectory, logName);
 
-const logger = winston.createLogger({
-    levels: winston.config.syslog.levels,
-    format: format.combine(
-        format.label({ label: 'meteolakesAPI' }),
-        format.timestamp(),
-        myFormat
-    ),
-    transports: [transport]
-});
+    fs.existsSync(directory) || fs.mkdirSync(directory);
 
-if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
-    logger.add(new winston.transports.Console({ level: 'debug' }));
+    let transport = new (winston.transports.DailyRotateFile)({
+        filename: `${logName}-%DATE%.log`,
+        dirname: directory,
+        datePattern: 'YYYY-MM-DD-HH',
+        zippedArchive: false,
+        maxSize: '20m',
+        maxFiles: '365d'
+    });
+
+    let logger = winston.createLogger({
+        levels: winston.config.syslog.levels,
+        format: format.combine(
+            format.label({ label: 'meteolakesAPI' }),
+            format.timestamp(),
+            myFormat
+        ),
+        transports: [transport]
+    });
+
+    if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+        logger.add(new winston.transports.Console({ level: 'debug' }));
+    }
+
+    return logger;
 }
 
-let winstonStream = split().on('data', function (line) {
-    logger.info(line);
-});
+const logger = createLogger('application');
+const requestLogger = createLogger('request');
 
-const morganLogger = morgan(':method :url :status :res[content-length] - :response-time ms', { stream: winstonStream });
+let winstonStream = split().on('data', function (line) {
+    requestLogger.info(line);
+});
+const morganLogger = morgan(':remote-addr :method :url HTTP/:http-version :status :res[content-length] :response-time ms', { stream: winstonStream });
 
 logger.info('logger created with level ' + logger.level + ' in ' + process.env.NODE_ENV + ' environment.');
 
 module.exports.logger = logger;
-module.exports.morgan = morganLogger;
+module.exports.request = morganLogger;
