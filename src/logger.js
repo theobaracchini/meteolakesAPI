@@ -25,10 +25,9 @@ function createLogger(logName) {
     let transport = new (winston.transports.DailyRotateFile)({
         filename: `${logName}-%DATE%.log`,
         dirname: directory,
-        datePattern: 'YYYY-MM-DD-HH',
+        datePattern: 'YYYY-MM-DD',
         zippedArchive: false,
         maxSize: '20m',
-        maxFiles: '365d'
     });
 
     let logger = winston.createLogger({

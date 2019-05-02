@@ -4,6 +4,7 @@ const MeteolakesFile = require('MeteolakesFile');
 const variables = require('enum/variables');
 const utils = require('utils');
 const date = require('date');
+const logger = require('logger').logger;
 
 function getLayer (lake, variable, time, depth) {
     let properties = checkProperties(variable, time, depth);
@@ -33,7 +34,7 @@ function getTableFromCoordinates (x, y, lake, variable, startTime, endTime, dept
 
       const file = new MeteolakesFile(utils.getFilePathFromTime(lake, time.start));
       fileTable = file.getTable(coordinates.x, coordinates.y, properties.variable, time.start, endTime, properties.depth);
-      console.log('Warning: interface between years detected. Please make different requests for different years');
+      logger.warn('interface between years detected. Please make different requests for different years');
 
     } else {
 
