@@ -59,7 +59,7 @@ class MeteolakesFile {
         return utils.formatTable(this.ySize, this.xSize, result);
     }
 
-    getTable (x, y, variable, startTime, endTime, depth) {
+    getTable (x, y, variable, startTime, endTime, depth, includeRange = false) {
         let table = [];
 
         let coordinates = utils.getCoordinatesIndex(utils.formatTable(this.ySize, this.xSize, this.longitudeArray),
@@ -84,13 +84,61 @@ class MeteolakesFile {
             depthLabel = this.depthArray.map(d => d.toFixed(1));
         }
 
+        if(includeRange) {
+            depthLabel = depthLabel.reduce((r, a) => r.concat(a, ['min', 'max']), []);
+        }
+
         if (variable === 'velocity') {
             let resultVx = this.getValues(colIndex, rowIndex, variables.HORIZONTAL_VELOCITY, startTimeIndex, endTimeIndex, timeSize, depthIndex, depthSize);
             let resultVy = this.getValues(colIndex, rowIndex, variables.VERTICAL_VELOCITY, startTimeIndex, endTimeIndex, timeSize, depthIndex, depthSize);
             table = utils.formatTable(depthSize, timeSize, resultVx, resultVy);
+            if(includeRange) {
+                // TODO: read resultMinV(x|y) and resultMaxV(x|y) from the netCdf file
+                let resultMinVx;// = resultVx.map(x => x - .02);
+                let resultMinVy;// = resultVy.map(x => x - .02);
+
+                let resultMaxVx;// = resultVx.map(x => x + .02);
+                let resultMaxVy;// = resultVy.map(x => x + .02);
+
+
+                if(resultMinVx && resultMinVy
+                    && resultMaxVx && resultMaxVy ) {
+                    // Append min and max only when they are available
+
+                    let resultArrayMin = utils.formatTable(depthSize, timeSize, resultMinVx, resultMinVy);
+                    let resultArrayMax = utils.formatTable(depthSize, timeSize, resultMaxVx, resultMaxVy);
+
+                    let resultArray = []
+                    for(let i = 0; i < table.length; i++) {
+                        resultArray.push(table[i]);
+                        resultArray.push(resultArrayMin[i]);
+                        resultArray.push(resultArrayMax[i]);
+                    }
+                    table = resultArray;
+                }
+            }
         } else {
             let result = this.getValues(colIndex, rowIndex, variable, startTimeIndex, endTimeIndex, timeSize, depthIndex, depthSize);
             table = utils.formatTable(depthSize, timeSize, result);
+            if(includeRange) {
+                // TODO: read resultMin and resultMax from the netCdf file
+                let resultMin;// = result.map(x => x - .2);
+                let resultMax;// = result.map(x => x + .2);
+
+                if(resultMin && resultMax) {
+                    // Append min and max only when they are available
+                    let resultArrayMin = utils.formatTable(depthSize, timeSize, resultMin);
+                    let resultArrayMax = utils.formatTable(depthSize, timeSize, resultMax);
+
+                    let resultArray = []
+                    for(let i = 0; i < table.length; i++) {
+                        resultArray.push(table[i]);
+                        resultArray.push(resultArrayMin[i]);
+                        resultArray.push(resultArrayMax[i]);
+                    }
+                    table = resultArray;
+                }
+            }
         }
 
         let timeLabel = dateUtils.getTimeLabel(this.timeArray, startTimeIndex, endTimeIndex);

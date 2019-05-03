@@ -15,7 +15,7 @@ function getLayer (lake, variable, time, depth) {
 }
 
 
-function getTableFromCoordinates (x, y, lake, variable, startTime, endTime, depth) {
+function getTableFromCoordinates (x, y, lake, variable, startTime, endTime, depth, includeRange = false) {
     let properties = checkProperties(variable, null, depth);
     let time = checkTime(startTime, endTime);
     let coordinates = checkCoordinates(x, y);
@@ -23,9 +23,6 @@ function getTableFromCoordinates (x, y, lake, variable, startTime, endTime, dept
     const startDateInfo = date.getDateDetails(new Date(parseFloat(startTime)));
     const endDateInfo = date.getDateDetails(new Date(parseFloat(endTime)));
     const weekIni = startDateInfo.week;
-    const weekEnd = endDateInfo.week;
-	//const weekEnd = weekIni+1;
-    var weekNbr = weekIni;
 	
 	var fileTable = [];	
     if (date.compare(startDateInfo, endDateInfo) == 1) {
@@ -33,7 +30,7 @@ function getTableFromCoordinates (x, y, lake, variable, startTime, endTime, dept
       let endTime = utils.getDateFromIsoweek(weekIni,startDateInfo.year,8);
 
       const file = new MeteolakesFile(utils.getFilePathFromTime(lake, time.start));
-      fileTable = file.getTable(coordinates.x, coordinates.y, properties.variable, time.start, endTime, properties.depth);
+      fileTable = file.getTable(coordinates.x, coordinates.y, properties.variable, time.start, endTime, properties.depth, includeRange);
       logger.warn('interface between years detected. Please make different requests for different years');
 
     } else {
@@ -46,24 +43,23 @@ function getTableFromCoordinates (x, y, lake, variable, startTime, endTime, dept
             let timeEndWeek = Math.min(endTime,timeWeekEnd);
 
             var file = new MeteolakesFile(utils.getFilePathFromTime(lake, timeStartWeek));
-            var fileTableSub = file.getTable(coordinates.x, coordinates.y, properties.variable, timeStartWeek, timeEndWeek, properties.depth);
+            var fileTableSub = file.getTable(coordinates.x, coordinates.y, properties.variable, timeStartWeek, timeEndWeek, properties.depth, includeRange);
                 
             if (fileTable.length > 0){
-            for (let i = 0; i < fileTable.length; i++){
-                delete fileTableSub[i][0]
-                let filteredArray = fileTableSub[i].filter(function () { return true });
-                //fileTable[i].push(filteredArray)
-                fileTable[i] = fileTable[i].concat(filteredArray);
-            }
-            } else{
+                for (let i = 0; i < fileTable.length; i++) {
+                    delete fileTableSub[i][0]
+                    let filteredArray = fileTableSub[i].filter(function () { return true });
+
+                    fileTable[i] = fileTable[i].concat(filteredArray);
+                }
+            } else {
                 fileTable = fileTable.concat(fileTableSub);
             }
             currentDateInfo = date.addWeek(currentDateInfo);
         }
 	  
-	}
-	//console.log(fileTable)
-
+    }
+    
     return fileTable;
 }
 
