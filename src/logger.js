@@ -26,7 +26,7 @@ function createLogger(logName) {
         filename: `${logName}-%DATE%.log`,
         dirname: directory,
         datePattern: 'YYYY-MM-DD',
-        zippedArchive: false,
+        zippedArchive: true,
         maxSize: '20m',
     });
 
