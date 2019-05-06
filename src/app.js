@@ -5,7 +5,7 @@ const express = require('express');
 const helmet = require('helmet');
 const controller = require('controller');
 const log = require('logger');
-const morgan = log.morgan;
+const request = log.request;
 const logger = log.logger;
 
 const app = express();
@@ -24,7 +24,7 @@ var corsOptions = {
   }
 }
 
-app.use(morgan);
+app.use(request);
 
 app.use(helmet());
 
@@ -50,6 +50,18 @@ app.get('/api/coordinates/:x/:y/:lake/:variable/:startTime/:endTime/:depth', (re
     res.setHeader('Content-disposition', `attachment; filename=Table_${req.params.lake}_${req.params.variable}_coor-${req.params.x}-${req.params.y}_from${req.params.startTime}_to${req.params.endTime}.csv`);
     res.set('Content-Type', 'text/csv');
     res.csv(controller.getTableFromCoordinates(req.params.x, req.params.y, req.params.lake, req.params.variable, req.params.startTime, req.params.endTime, req.params.depth));
+});
+
+app.get('/api/range/coordinates/:x/:y/:lake/:variable/:startTime/:endTime', (req, res) => {
+  res.setHeader('Content-disposition', `attachment; filename=Table_${req.params.lake}_${req.params.variable}_coor-${req.params.x}-${req.params.y}_from${req.params.startTime}_to${req.params.endTime}.csv`);
+  res.set('Content-Type', 'text/csv');
+  res.csv(controller.getTableFromCoordinates(req.params.x, req.params.y, req.params.lake, req.params.variable, req.params.startTime, req.params.endTime, null, true));
+});
+
+app.get('/api/range/coordinates/:x/:y/:lake/:variable/:startTime/:endTime/:depth', (req, res) => {
+  res.setHeader('Content-disposition', `attachment; filename=Table_${req.params.lake}_${req.params.variable}_coor-${req.params.x}-${req.params.y}_from${req.params.startTime}_to${req.params.endTime}.csv`);
+  res.set('Content-Type', 'text/csv');
+  res.csv(controller.getTableFromCoordinates(req.params.x, req.params.y, req.params.lake, req.params.variable, req.params.startTime, req.params.endTime, req.params.depth, true));
 });
 
 app.get('/api/week/:weekNumber/:year/:lake/:variable/:depth', (req, res) => {

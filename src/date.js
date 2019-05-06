@@ -12,32 +12,55 @@ function getJsTimestamp (matlabTimestamp) {
 }
 
 function getDateDetails (date) {
-    let result = {
-        week: getWeek(date),
+        // Copy date so don't modify original
+        date = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        // Set to nearest Thursday: current date + 4 - current day number
+        // Make Sunday's day number 7
+        date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay()||7));
+        // Get first day of year
+        var yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
+        // Calculate full weeks to nearest Thursday
+        var weekNo = Math.ceil(( ( (date - yearStart) / 86400000) + 1)/7);
+        // Return array of year and week number
+    return {
+        week: weekNo,
         year: date.getUTCFullYear()
     };
-
-    if (result.week === 0) {
-        result.year--;
-        result.week = getWeek(new Date(Date.UTC(result.year, 11, 31)));
-    } else if (result.week === 53) {
-        const sunday = findSunday(date);
-        if (sunday.getUTCMonth() === 0 && sunday.getUTCDate() >= 4) {
-            result.year++;
-            result.week = 1;
-        }
-    }
-
-    return result;
 }
 
-function getWeek (date) {
-    // use 7 for Sunday instead of 0.
-    const weekday = date.getUTCDay() ? date.getUTCDay() : 7;
-    const firstJan = new Date(Date.UTC(date.getUTCFullYear(), 0));
-    const ordinalDay = Math.floor((date - firstJan) / MILISECONDS_IN_DAY) + 1;
+function addWeek(dateDetails) {
+    if(dateDetails.week === getLastWeekOfYear(dateDetails.year)) {
+        return {
+            week: 1,
+            year: dateDetails.year + 1
+        };
+    }
+    return {
+        week: dateDetails.week + 1,
+        year: dateDetails.year
+    };
+}
 
-    return Math.floor((ordinalDay - weekday + 10) / 7);
+function getLastWeekOfYear(year) {
+    return getDateDetails(new Date(`12/28/${year}`)).week;
+}
+
+function compare(dateDetails1, dateDetails2) {
+    if(dateDetails1.year < dateDetails2.year) {
+        return -1;
+    }
+    if(dateDetails1.year > dateDetails2.year) {
+        return 1;
+    }
+    // At this point years are equal
+    if(dateDetails1.week < dateDetails2.week) {
+        return -1;
+    }
+    if(dateDetails1.week > dateDetails2.week) {
+        return 1;
+    }
+    // At this point dates are equal
+    return 0;
 }
 
 function findSunday (date) {
@@ -69,3 +92,5 @@ module.exports.transformDate = transformDate;
 module.exports.getJsTimestamp = getJsTimestamp;
 module.exports.getDateDetails = getDateDetails;
 module.exports.getTimeLabel = getTimeLabel;
+module.exports.compare = compare;
+module.exports.addWeek = addWeek;
