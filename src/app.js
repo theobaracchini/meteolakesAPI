@@ -28,7 +28,7 @@ app.use(morgan);
 
 app.use(helmet());
 
-app.get('/api/layer/:lake/:variable/:time/:depth', cors(corsOptions), (req, res) => {
+app.get('/api/layer/:lake/:variable/:time/:depth', (req, res) => {
     res.setHeader('Content-disposition', `attachment; filename=Layer_${req.params.lake}_${req.params.variable}_${req.params.depth}_${req.params.time}.csv`);
     res.set('Content-Type', 'text/csv');
     res.csv(controller.getLayer(req.params.lake, req.params.variable, req.params.time, req.params.depth));
