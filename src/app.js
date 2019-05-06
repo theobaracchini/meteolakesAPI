@@ -76,6 +76,11 @@ app.get('/api/week/:weekNumber/:year/:lake/:variable', cors(corsOptions), (req, 
     res.csv(controller.getWeekData(req.params.weekNumber, req.params.year, req.params.lake, req.params.variable));
 });
 
+app.get('/api/status', (req, res) => {
+    res.set('Content-Type', 'application/json');
+    res.json(true);
+});
+
 app.use(function (err, req, res, next) {
     logger.error(err.stack);
     let statusCode = 500;
