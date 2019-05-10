@@ -100,19 +100,15 @@ class MeteolakesFile {
             table = utils.formatTable(depthSize, timeSize, resultVx, resultVy);
             if(includeRange) {
 				
-				let resultMinVx = this.getValues(colIndex, rowIndex, variables.HORIZONTAL_VELOCITY_MIN, startTimeIndex, endTimeIndex, timeSize, depthIndex, depthSize);
-				let resultMinVy = this.getValues(colIndex, rowIndex, variables.VERTICAL_VELOCITY_MIN, startTimeIndex, endTimeIndex, timeSize, depthIndex, depthSize);
-
-				let resultMaxVx = this.getValues(colIndex, rowIndex, variables.HORIZONTAL_VELOCITY_MAX, startTimeIndex, endTimeIndex, timeSize, depthIndex, depthSize);
-				let resultMaxVy = this.getValues(colIndex, rowIndex, variables.VERTICAL_VELOCITY_MAX, startTimeIndex, endTimeIndex, timeSize, depthIndex, depthSize);
+				let resultMinUV = this.getValues(colIndex, rowIndex, variables.VELOCITY_MIN, startTimeIndex, endTimeIndex, timeSize, depthIndex, depthSize);
+				let resultMaxUV = this.getValues(colIndex, rowIndex, variables.VELOCITY_MAX, startTimeIndex, endTimeIndex, timeSize, depthIndex, depthSize);
 
 
-                if(resultMinVx && resultMinVy
-                    && resultMaxVx && resultMaxVy ) {
+                if(resultMinUV && resultMaxUV) {
                     // Append min and max only when they are available
 
-                    let resultArrayMin = utils.formatTable(depthSize, timeSize, resultMinVx, resultMinVy);
-                    let resultArrayMax = utils.formatTable(depthSize, timeSize, resultMaxVx, resultMaxVy);
+                    let resultArrayMin = utils.formatTable(depthSize, timeSize, resultMinUV);
+                    let resultArrayMax = utils.formatTable(depthSize, timeSize, resultMaxUV);
 
                     let resultArray = []
                     for(let i = 0; i < table.length; i++) {
