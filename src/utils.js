@@ -124,6 +124,10 @@ function getFilePath (lake, year, week) {
     return filePath;
 }
 
+function getDaFilePathFromPath(path) {
+	return path.replace(".nc", "da.nc");
+}
+
 function addLabel (table, firstRow, firstCol) {
     let result = [];
     result.push(firstRow);
@@ -182,3 +186,4 @@ module.exports.addLabel = addLabel;
 module.exports.verifyNumber = verifyNumber;
 module.exports.createDepthArray = createDepthArray;
 module.exports.getDateFromIsoweek = getDateFromIsoweek;
+module.exports.getDaFilePathFromPath = getDaFilePathFromPath;
