@@ -125,7 +125,7 @@ function getFilePath (lake, year, week) {
 }
 
 function getDaFilePathFromPath(path) {
-	return path.replace(".nc", "da.nc");
+	return path.replace(".nc", "_DA.nc");
 }
 
 function addLabel (table, firstRow, firstCol) {

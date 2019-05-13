@@ -1,5 +1,6 @@
 module.exports = {
     X: 'M',
     Y: 'N',
-    Z: 'KMAXOUT_RESTR'
+    Z: 'KMAXOUT_RESTR',
+    time: 'time'
 };

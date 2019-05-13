@@ -22,8 +22,11 @@ class MeteolakesFile {
 		this.reader = new NetCDFReader(data); // read the header
 		
 		this.daPath = utils.getDaFilePathFromPath(path);
+		logger.info(this.daPath);
 		if(fs.existsSync(this.daPath)) {
-			this.daReader = new NetCDFReader(fs.readFileSync(this.daPath));
+            this.daReader = new NetCDFReader(fs.readFileSync(this.daPath));
+            this.daDimensions = this.daReader.dimensions;
+            this.daTime = this.daDimensions.find(dim => dim.name === dimensions.time).size;
 		}
 
         this.header = this.reader.header;
@@ -33,7 +36,8 @@ class MeteolakesFile {
         this.depthSize = this.dimensions.find(dim => dim.name === dimensions.Z).size;
         this.ySize = this.dimensions.find(dim => dim.name === dimensions.Y).size;
         this.xSize = this.dimensions.find(dim => dim.name === dimensions.X).size;
-
+        this.time = this.dimensions.find(dim => dim.name === dimensions.time).size;
+        
         this.timeArray = this.reader.getDataVariable(variables.TIME);
         this.depthArray = this.reader.getDataVariable(variables.DEPTH);
         this.longitudeArray = this.reader.getDataVariable(variables.LONGITUDE);
@@ -107,14 +111,22 @@ class MeteolakesFile {
                 if(resultMinUV && resultMaxUV) {
                     // Append min and max only when they are available
 
-                    let resultArrayMin = utils.formatTable(depthSize, timeSize, resultMinUV);
-                    let resultArrayMax = utils.formatTable(depthSize, timeSize, resultMaxUV);
+                    let resultArrayMin = utils.formatTable(depthSize, resultMinUV.length, resultMinUV);
+                    let resultArrayMax = utils.formatTable(depthSize, resultMaxUV.length, resultMaxUV);
 
                     let resultArray = []
                     for(let i = 0; i < table.length; i++) {
                         resultArray.push(table[i]);
-                        resultArray.push(resultArrayMin[i]);
-                        resultArray.push(resultArrayMax[i]);
+                        if(resultArrayMin.length > i) {
+                            resultArray.push(resultArrayMin[i]);
+                        } else {
+                            resultArray.push(-999); // Will be transformed to NaN
+                        }
+                        if(resultArrayMax.length > i) {
+                            resultArray.push(resultArrayMax[i]);
+                        } else {
+                            resultArray.push(-999); // Will be transformed to NaN
+                        }
                     }
                     table = resultArray;
                 }
@@ -129,14 +141,22 @@ class MeteolakesFile {
 
                 if(resultMin && resultMax) {
                     // Append min and max only when they are available
-                    let resultArrayMin = utils.formatTable(depthSize, timeSize, resultMin);
-                    let resultArrayMax = utils.formatTable(depthSize, timeSize, resultMax);
+                    let resultArrayMin = utils.formatTable(depthSize, resultMin.length, resultMin);
+                    let resultArrayMax = utils.formatTable(depthSize, resultMax.length, resultMax);
 
                     let resultArray = []
                     for(let i = 0; i < table.length; i++) {
                         resultArray.push(table[i]);
-                        resultArray.push(resultArrayMin[i]);
-                        resultArray.push(resultArrayMax[i]);
+                        if(resultArrayMin.length > i) {
+                            resultArray.push(resultArrayMin[i]);
+                        } else {
+                            resultArray.push(-999); // Will be transformed to NaN
+                        }
+                        if(resultArrayMax.length > i) {
+                            resultArray.push(resultArrayMax[i]);
+                        } else {
+                            resultArray.push(-999); // Will be transformed to NaN
+                        }
                     }
                     table = resultArray;
                 }
@@ -206,34 +226,38 @@ class MeteolakesFile {
         return result;
     }
 	
-	getDataVariableFiltered(variableName, ...filterValues) {
-		// Try to retrive avg data from data assimilation. If not, return data rfom regular simulation
+	getDataVariableFiltered(variableName, start, end, ...filterValues) {
+		// Try to retrive avg data from data assimilation. If not, return data from regular simulation
 		let data = null;
 		if(this.daReader) {
 			if(variableName.endsWith('MAX') || variableName.endsWith('MIN')) {
 				logger.info(`Retrieve ${variableName} data from file ${this.daPath}`);
 				try {
-					data = this.daReader.getDataVariableFiltered(variableName, ...filterValues);
+                    // If DA data contains less timesteps than normal simulation (likely to happen since DA takes more time to finish)
+                    data = this.daReader.getDataVariableFiltered(variableName, start, Math.min(end, this.daTime), ...filterValues);
 				} catch (err) {
 					logger.info(err.message);
 				}
 			} else {
 				logger.info(`Retrieve ${variableName}_AVG data from file ${this.daPath}`);
 				try {
-					data = this.daReader.getDataVariableFiltered(variableName+"_AVG", ...filterValues);
-				} catch {
-					logger.info(`Fallback: retrieve ${variableName} data from file ${this.path}`);
-					try {
-						data = this.reader.getDataVariableFiltered(variableName, ...filterValues);
-					} catch (err) {
-						logger.info(err.message);
-					}
+                    let dataDa = this.daReader.getDataVariableFiltered(variableName+"_AVG", start, Math.min(end, this.daTime), ...filterValues);
+                    logger.info(`Read ${dataDa.length} data for ${variableName}_AVG from file ${this.daPath}`);
+
+                    logger.info(`Retrieve ${variableName} data from file ${this.path}`);
+                    let dataStd = this.reader.getDataVariableFiltered(variableName, start, end, ...filterValues);
+
+                    let dataSlice = dataStd.slice(dataDa.length);
+                    logger.info(`Read ${dataSlice.length} more data for ${variableName} from file ${this.path}`);
+                    data = dataDa.concat(dataSlice);
+				} catch(err) {
+					logger.info(err.message);
 				}
 			}
 		} else {
 			logger.info(`Retrieve ${variableName} data from file ${this.path}`);
 			try {
-				data = this.reader.getDataVariableFiltered(variableName, ...filterValues);
+				data = this.reader.getDataVariableFiltered(variableName, start, end, ...filterValues);
 			} catch (err) {
 				logger.info(err.message);
 			}
