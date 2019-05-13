@@ -7,11 +7,12 @@ const variables = require('enum/variables');
 const logger = require('logger').logger;
 const utils = require('utils');
 const dateUtils = require('date');
+const config = require('config/config')();
 
 class MeteolakesFile {
     constructor (path) {
         let data = null;
-		let dataDa = null;
+		
         try {
             data = fs.readFileSync(path);
         } catch (err) {
@@ -229,7 +230,7 @@ class MeteolakesFile {
 	getDataVariableFiltered(variableName, start, end, ...filterValues) {
 		// Try to retrive avg data from data assimilation. If not, return data from regular simulation
 		let data = null;
-		if(this.daReader) {
+		if(this.daReader && !config.da_disabled) {
 			if(variableName.endsWith('MAX') || variableName.endsWith('MIN')) {
 				logger.info(`Retrieve ${variableName} data from file ${this.daPath}`);
 				try {
